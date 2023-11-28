@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const config = require("../config").get();
+const config = require("../config").get;
 
 const username = config("MONGO_USERNAME");
 const password = config("MONGO_PASSWORD");
