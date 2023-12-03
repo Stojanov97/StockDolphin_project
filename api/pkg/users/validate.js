@@ -1,5 +1,3 @@
-const { Validator } = require("node-input-validator");
-
 const UserRegister = {
   name: "required|string",
   lastName: "required|string",
@@ -19,20 +17,8 @@ const UserResetPassword = {
   confirmNewPassword: "required|string",
 };
 
-const validate = async (data, schema) => {
-  let v = new Validator(data, schema);
-  let e = v.check();
-  if (!e) {
-    throw {
-      code: 400,
-      error: v.errors,
-    };
-  }
-};
-
 module.exports = {
   UserRegister,
   UserLogin,
   UserResetPassword,
-  validate,
 };

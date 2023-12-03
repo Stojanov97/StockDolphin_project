@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const CategoryScheme = new mongoose.Schema({
   name: { type: String, required: true },
-  photo: { type: File, required: true },
+  photo: { type: String, required: true },
   By: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "User",

@@ -3,8 +3,8 @@ const config = require("../config").get;
 
 const username = config("MONGO_USERNAME");
 const password = config("MONGO_PASSWORD");
-const cluster = config("MONGO_CLUSTER");
 const database = config("MONGO_DATABASE");
+const cluster = config("MONGO_CLUSTER");
 
 const uri = `mongodb+srv://${username}:${password}@${cluster}/${database}?retryWrites=true&w=majority`;
 

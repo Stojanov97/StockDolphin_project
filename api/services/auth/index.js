@@ -16,7 +16,7 @@ service.use(cookieParser());
 service.use(express.json());
 service.post("/api/v1/auth/register", registerHandler);
 service.post("/api/v1/auth/login", loginHandler);
-service.put("/api/v1/auth/update", updateCredentialsHandler);
+service.put("/api/v1/auth", updateCredentialsHandler);
 service.patch("/api/v1/auth/:id", resetPasswordHandler);
 service.delete("/api/v1/auth/:id", deleteHandler);
 service.listen(port, (err) =>

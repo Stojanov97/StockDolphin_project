@@ -12,8 +12,8 @@ const {
   UserRegister,
   UserLogin,
   UserResetPassword,
-  validate,
 } = require("../../../pkg/users/validate");
+const { validate } = require("../../../pkg/validator");
 const config = require("../../../pkg/config").get;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -60,6 +60,7 @@ const loginHandler = async (req, res) => {
     const payload = {
       username: user.username,
       email: email,
+      admin: user.admin,
       id: user._id,
     };
     const token = await jwt.sign(payload, secret);
@@ -75,7 +76,7 @@ const loginHandler = async (req, res) => {
 const updateCredentialsHandler = async (req, res) => {
   try {
     const token = jwt.verify(req.cookies.token, secret);
-    if (req.body.password) return res.send("unavailable");
+    if (req.body.password || req.body.admin) return res.send("unavailable");
     await update(token.id, req.body);
     return res.status(200).send("updated");
   } catch (err) {
@@ -109,6 +110,8 @@ const resetPasswordHandler = async (req, res) => {
 
 const deleteHandler = async (req, res) => {
   try {
+    const token = jwt.verify(req.cookies.token, secret);
+    if (token.admin != true) throw new Error("you are not an admin");
     const id = req.params.id;
     await remove(id);
     return res.status(200).send("deleted successfully");

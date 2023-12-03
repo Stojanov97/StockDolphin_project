@@ -7,12 +7,18 @@ const {
   update,
   remove,
 } = require("../../pkg/categories");
+const imageToBase64 = require("image-to-base64");
 const api = express();
 const port = 3000;
 
+api.use(express.json());
+api.use(express.urlencoded({ extended: true }));
+
 api.post("/", async (req, res) => {
   try {
-    await create(req.body);
+    // req.body.photo = await imageToBase64(req.body.photo);
+    console.log(req.body);
+    // await create(req.body);
     return res.status(200).send("success");
   } catch (err) {
     throw new Error(err);
