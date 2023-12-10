@@ -12,6 +12,10 @@ const UserLogin = {
   password: "required|string",
 };
 
+const UserRequestResetPassword = {
+  email: "required|email",
+};
+
 const UserResetPassword = {
   newPassword: "required|string",
   confirmNewPassword: "required|string",
@@ -20,5 +24,6 @@ const UserResetPassword = {
 module.exports = {
   UserRegister,
   UserLogin,
+  UserRequestResetPassword,
   UserResetPassword,
 };

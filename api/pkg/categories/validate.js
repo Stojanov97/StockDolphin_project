@@ -1,6 +1,5 @@
 const CategoryCreate = {
   name: "required|string",
-  photo: "required|string",
   By: "required|string",
 };
 

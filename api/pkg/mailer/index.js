@@ -1,6 +1,7 @@
 const mailer = require("@sendgrid/mail");
 const key = require("../config").get("SEND_GRID_KEY");
 const fs = require("fs");
+mailer.setApiKey(key);
 
 const readFile = (template) => {
   return new Promise((resolve, reject) =>
@@ -23,17 +24,15 @@ function Mail(to, subject, html) {
 
 const welcomeTemplate = async (username) => {
   let template = await readFile("welcome.html");
-  return await template.replace("{{username}}", username);
+  return await template.replaceAll("{{username}}", username);
 };
 
 const resetTemplate = async (username, id) => {
   let template = await readFile("reset_password.html");
   return await template
-    .replace("{{username}}", username)
-    .replace("{{reset_password_link}}", id);
+    .replaceAll("{{username}}", username)
+    .replaceAll("{{reset_password_link}}", id);
 };
-
-mailer.setApiKey(key);
 
 const sendMail = async (to, subject, template) => {
   try {
