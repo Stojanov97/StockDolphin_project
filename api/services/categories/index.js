@@ -12,7 +12,7 @@ const fileUpload = require("express-fileupload");
 const api = express();
 const port = 3000;
 
-const { upload } = require("../../pkg/files");
+const { upload, download } = require("../../pkg/files");
 
 api.use(express.json());
 api.use(express.urlencoded({ extended: true }));
@@ -20,12 +20,10 @@ api.use(fileUpload());
 
 api.post("/", async (req, res) => {
   try {
-    let category = await create(req.body);
-    await upload(req.files.photo, "asdfasd");
-    // req.body.photo = await imageToBase64(req.body.photo);
-    // console.log();
-    // await create(req.body);
-    return res.status(200).send("success");
+    // let category = await create(req.body);
+    // await upload(req.files.photo, "categories", category._id);
+    // return res.status(200).send("success");
+    await download("categories", "6576405b013b6764a3590f72");
   } catch (err) {
     console.log(err);
     return res

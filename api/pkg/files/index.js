@@ -11,39 +11,61 @@ const setID = async () => {
   return ID;
 };
 
-const getFile = async () => {};
-
-const upload = async (file, id) => {
-  if (MAX_FILESIZE < file.size)
-    throw {
-      code: 400,
-      error: "File exceeds the max file size",
-    };
-  if (!FILETYPES.includes(file.mimetype))
-    throw {
-      code: 400,
-      error: "Unsupported file type",
-    };
-  const categoryDirectory = `${__dirname}/../../uploads/cat_${id}`;
-  const filePath = `${categoryDirectory}/${await setID()}_${file.name}`;
-  await fs.open(categoryDirectory, "r", async (err) => {
-    if (err) {
-      if (err.code === "ENOENT")
-        await fs.mkdir(categoryDirectory, { recursive: true }, (err) => {
+const download = async (type, id) => {
+  try {
+    const destination = `${__dirname}/../../uploads/${type}/${id}`;
+    await fs.open(destination, "r", async (err) => {
+      if (err) {
+        if (err.code === "ENOENT") throw { code: 404, error: "File not found" };
+      } else {
+        let file;
+        await fs.readdir(destination, { recursive: true }, (err, files) => {
           if (err) throw err;
-          else
-            file.mv(filePath, (err) => {
-              if (err) throw err;
-            });
+          else console.log(files);
         });
-    } else {
-      await file.mv(filePath, (err) => {
-        if (err) throw err;
-      });
-    }
-  });
+      }
+    });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+const upload = async (file, type, id) => {
+  try {
+    if (MAX_FILESIZE < file.size)
+      throw {
+        code: 400,
+        error: "File exceeds the max file size",
+      };
+    if (!FILETYPES.includes(file.mimetype))
+      throw {
+        code: 400,
+        error: "Unsupported file type",
+      };
+    const destination = `${__dirname}/../../uploads/${type}/${id}`;
+    const filePath = `${destination}/${await setID()}_${file.name}`;
+    await fs.open(destination, "r", async (err) => {
+      if (err) {
+        if (err.code === "ENOENT")
+          await fs.mkdir(destination, { recursive: true }, (err) => {
+            if (err) throw err;
+            else
+              file.mv(filePath, (err) => {
+                if (err) throw err;
+              });
+          });
+      } else {
+        await file.mv(filePath, (err) => {
+          if (err) throw err;
+        });
+      }
+    });
+  } catch (err) {
+    throw new Error(err);
+  }
 };
 
 module.exports = {
   upload,
+  download,
 };
