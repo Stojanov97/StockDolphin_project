@@ -11,20 +11,21 @@ const setID = async () => {
   return ID;
 };
 
+const moveFile = async (file, to) => {
+  file.mv(to, (err) => {
+    if (err) throw err;
+  });
+};
 const download = async (type, id) => {
   try {
     const destination = `${__dirname}/../../uploads/${type}/${id}`;
-    await fs.open(destination, "r", async (err) => {
-      if (err) {
-        if (err.code === "ENOENT") throw { code: 404, error: "File not found" };
-      } else {
-        let file;
-        await fs.readdir(destination, { recursive: true }, (err, files) => {
-          if (err) throw err;
-          else console.log(files);
-        });
-      }
-    });
+    let files = await new Promise((resolve, reject) =>
+      fs.readdir(destination, { recursive: true }, (err, files) => {
+        if (err) reject(err);
+        else resolve(files);
+      })
+    );
+    return `${destination}/${files[0]}`;
   } catch (err) {
     throw new Error(err);
   }
@@ -44,27 +45,31 @@ const upload = async (file, type, id) => {
       };
     const destination = `${__dirname}/../../uploads/${type}/${id}`;
     const filePath = `${destination}/${await setID()}_${file.name}`;
-    await fs.open(destination, "r", async (err) => {
-      if (err) {
-        if (err.code === "ENOENT")
-          await fs.mkdir(destination, { recursive: true }, (err) => {
+    await fs.open(destination, "r+", (err, fd) => {
+      try {
+        if (err) {
+          if (err.code === "EEXIST") {
+            moveFile(file, filePath);
+          } else if (err.code === "ENOENT") {
+            fs.mkdir(destination, { recursive: true }, (err) => {
+              if (err) throw err;
+              else moveFile(file, filePath);
+            });
+          }
+        }
+      } finally {
+        if (fd) {
+          fs.close(fd, (err) => {
             if (err) throw err;
-            else
-              file.mv(filePath, (err) => {
-                if (err) throw err;
-              });
           });
-      } else {
-        await file.mv(filePath, (err) => {
-          if (err) throw err;
-        });
+        }
       }
     });
   } catch (err) {
     throw new Error(err);
   }
 };
-
+fs.ex;
 module.exports = {
   upload,
   download,
