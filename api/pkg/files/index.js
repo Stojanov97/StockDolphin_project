@@ -16,7 +16,23 @@ const moveFile = async (file, to) => {
     if (err) throw err;
   });
 };
-const download = async (type, id) => {
+
+const downloadAll = async (type) => {
+  try {
+    const destination = `${__dirname}/../../uploads/${type}`;
+    let files = await new Promise((resolve, reject) =>
+      fs.readdir(destination, (err, files) => {
+        if (err) reject(err);
+        else resolve(files);
+      })
+    );
+    console.log(files);
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+const downloadOne = async (type, id) => {
   try {
     const destination = `${__dirname}/../../uploads/${type}/${id}`;
     let files = await new Promise((resolve, reject) =>
@@ -69,8 +85,20 @@ const upload = async (file, type, id) => {
     throw new Error(err);
   }
 };
-fs.ex;
+
+const removeFile = async (type, id) => {
+  try {
+    const destination = `${__dirname}/../../uploads/${type}/${id}`;
+    await fs.rmdir(destination, (err) => {
+      if (err) throw err;
+    });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
 module.exports = {
   upload,
-  download,
+  downloadOne,
+  downloadAll,
+  removeFile,
 };

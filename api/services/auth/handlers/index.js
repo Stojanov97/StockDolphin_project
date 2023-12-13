@@ -3,7 +3,6 @@ const {
   read,
   readByUsername,
   readByEmail,
-  readByID,
   update,
   changePassword,
   remove,
@@ -19,6 +18,7 @@ const config = require("../../../pkg/config").get;
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const secret = config("JWT_SECRET");
+const refreshSecret = config("REFRESH_JWT_SECRET");
 const {
   welcomeTemplate,
   resetTemplate,
@@ -43,13 +43,25 @@ const registerHandler = async (req, res) => {
       email: email,
       id: user._id,
     };
-    const token = await jwt.sign(payload, secret);
+    const token = await jwt.sign(payload, secret, { expiresIn: "30s" });
+    const refreshToken = await jwt.sign(payload, refreshSecret, {
+      expiresIn: "24h",
+    });
     sendMail(email, "Welcome To Our Platform", welcomeTemplate(username));
+    await res.cookie("token", token, {
+      expires: new Date(Date.now() + 30000),
+      httpOnly: true,
+    });
     return await res
-      .cookie("token", token, { expire: 900000 + Date.now() })
-      .send("created");
+      .cookie("refreshToken", refreshToken, {
+        expires: new Date(Date.now() + 86400000),
+        httpOnly: true,
+      })
+      .json({ success: true });
   } catch (err) {
-    res.status(err.code).send(err);
+    return res
+      .status(500 || err.code)
+      .json({ success: false, err: "Internal server error" || err.message });
   }
 };
 
@@ -69,23 +81,37 @@ const loginHandler = async (req, res) => {
       admin: user.admin,
       id: user._id,
     };
-    const token = await jwt.sign(payload, secret);
+    const token = await jwt.sign(payload, secret, { expiresIn: "30s" });
+    const refreshToken = await jwt.sign(payload, refreshSecret, {
+      expiresIn: "24h",
+    });
+    await res.cookie("token", token, {
+      expires: new Date(Date.now() + 30000),
+      httpOnly: true,
+    });
     return await res
-      .cookie("token", token, { expire: 900000 + Date.now() })
-      .send("logged");
+      .cookie("refreshToken", refreshToken, {
+        expires: new Date(Date.now() + 86400000),
+        httpOnly: true,
+      })
+      .json({ success: true });
   } catch (err) {
-    res.status(err.code).send(err.error);
+    return res
+      .status(500 || err.code)
+      .json({ success: false, err: "Internal server error" || err.message });
   }
 };
 
 const updateCredentialsHandler = async (req, res) => {
   try {
-    const token = jwt.verify(req.cookies.token, secret);
+    const token = req.auth;
     if (req.body.password || req.body.admin) return res.send("unavailable");
     await update(token.id, req.body);
-    return res.status(200).send("updated");
+    return res.status(200).json({ success: true });
   } catch (err) {
-    res.status(err.code).send(err.error);
+    return res
+      .status(500 || err.code)
+      .json({ success: false, err: "Internal server error" || err.message });
   }
 };
 
@@ -98,9 +124,11 @@ const requestResetPasswordHandler = async (req, res) => {
       "Password Reset Email",
       resetTemplate(user.username, user._id)
     );
-    return res.status(200).send("mail sent");
+    return res.status(200).json({ success: true });
   } catch (err) {
-    res.status(err.code).send(err.error);
+    return res
+      .status(500 || err.code)
+      .json({ success: false, err: "Internal server error" || err.message });
   }
 };
 
@@ -120,21 +148,37 @@ const resetPasswordHandler = async (req, res) => {
       parseInt(config("HASHING_SALT"))
     );
     await changePassword(id, password);
-    return res.status(200).send("password changes successfully");
+    return res.status(200).json({ success: true });
   } catch (err) {
-    res.status(err.code).send(err.error);
+    return res
+      .status(500 || err.code)
+      .json({ success: false, err: "Internal server error" || err.message });
   }
 };
 
 const deleteHandler = async (req, res) => {
   try {
-    const token = jwt.verify(req.cookies.token, secret);
+    const token = req.auth;
     if (token.admin != true) throw new Error("you are not an admin");
     const id = req.params.id;
     await remove(id);
-    return res.status(200).send("deleted successfully");
+    return res.status(200).json({ success: true });
   } catch (err) {
-    res.status(err.code).send(err.error);
+    return res
+      .status(500 || err.code)
+      .json({ success: false, err: "Internal server error" || err.message });
+  }
+};
+
+const logoutHandler = async (req, res) => {
+  try {
+    res.clearCookie("refreshToken");
+    res.clearCookie("token");
+    return res.send("cleared");
+  } catch (err) {
+    return res
+      .status(500 || err.code)
+      .json({ success: false, err: "Internal server error" || err.message });
   }
 };
 
@@ -145,4 +189,5 @@ module.exports = {
   requestResetPasswordHandler,
   resetPasswordHandler,
   deleteHandler,
+  logoutHandler,
 };

@@ -30,6 +30,14 @@ const read = async () => {
   }
 };
 
+const readByID = async (id) => {
+  try {
+    return await category.findOne({ _id: id });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 const readByUserID = async (id) => {
   try {
     return await category.findOne({ By: id });
@@ -57,6 +65,7 @@ const remove = async (id) => {
 module.exports = {
   create,
   read,
+  readByID,
   readByUserID,
   update,
   remove,
