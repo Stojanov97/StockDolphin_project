@@ -57,7 +57,7 @@ const registerHandler = async (req, res) => {
         expires: new Date(Date.now() + 86400000),
         httpOnly: true,
       })
-      .json({ success: true });
+      .json({ logged: true });
   } catch (err) {
     return res
       .status(500 || err.code)
@@ -94,7 +94,7 @@ const loginHandler = async (req, res) => {
         expires: new Date(Date.now() + 86400000),
         httpOnly: true,
       })
-      .json({ success: true });
+      .json({ logged: true });
   } catch (err) {
     return res
       .status(500 || err.code)
@@ -124,7 +124,7 @@ const requestResetPasswordHandler = async (req, res) => {
       "Password Reset Email",
       resetTemplate(user.username, user._id)
     );
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ sent: true });
   } catch (err) {
     return res
       .status(500 || err.code)
@@ -174,7 +174,18 @@ const logoutHandler = async (req, res) => {
   try {
     res.clearCookie("refreshToken");
     res.clearCookie("token");
-    return res.send("cleared");
+    return res.json({ logged: false });
+  } catch (err) {
+    return res
+      .status(500 || err.code)
+      .json({ success: false, err: "Internal server error" || err.message });
+  }
+};
+
+const readAllHandler = async (req, res) => {
+  try {
+    let users = await read();
+    return await res.json(users);
   } catch (err) {
     return res
       .status(500 || err.code)
@@ -190,4 +201,5 @@ module.exports = {
   resetPasswordHandler,
   deleteHandler,
   logoutHandler,
+  readAllHandler,
 };
