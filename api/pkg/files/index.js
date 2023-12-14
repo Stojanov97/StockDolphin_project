@@ -21,12 +21,14 @@ const downloadAll = async (type) => {
   try {
     const destination = `${__dirname}/../../uploads/${type}`;
     let files = await new Promise((resolve, reject) =>
-      fs.readdir(destination, (err, files) => {
+      fs.readdir(destination, { recursive: true }, (err, files) => {
         if (err) reject(err);
         else resolve(files);
       })
     );
-    console.log(files);
+    files = files.filter((path) => path.length > 24);
+    files = files.map((path) => `${destination}/${path}`);
+    return files;
   } catch (err) {
     throw new Error(err);
   }

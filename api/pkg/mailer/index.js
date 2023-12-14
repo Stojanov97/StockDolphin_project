@@ -37,7 +37,6 @@ const resetTemplate = async (username, id) => {
 const sendMail = async (to, subject, template) => {
   try {
     await mailer.send(new Mail(to, subject, await template));
-    console.log("mail sent");
   } catch (err) {
     throw new Error(err);
   }

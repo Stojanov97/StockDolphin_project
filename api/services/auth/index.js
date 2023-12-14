@@ -12,7 +12,6 @@ const {
   readAllHandler,
 } = require("./handlers");
 const { tokenRefresher } = require("../../pkg/tokenMiddleware");
-// const JWT = require("jsonwebtoken");
 const { expressjwt: jwt } = require("express-jwt");
 const cookieParser = require("cookie-parser");
 const service = express();
@@ -26,8 +25,7 @@ service.use(
     secret: config("JWT_SECRET"),
     algorithms: ["HS256"],
     getToken: function (req) {
-      let token = req.cookies.token || req.testingTeory;
-      console.log("token", token);
+      let token = req.cookies.token || req.refreshAccessToken;
       return token ? token : null;
     },
   }).unless({
