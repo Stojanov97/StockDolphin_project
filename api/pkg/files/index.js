@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 
 const chars = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
 const MAX_FILESIZE = 2097152;
@@ -26,24 +27,18 @@ const downloadAll = async (type) => {
         else resolve(files);
       })
     );
-    files = files.filter((path) => path.length > 24);
-    files = files.map((path) => `${destination}/${path}`);
+    files = files
+      .filter(
+        (value) => path.parse(value).base !== path.parse(value).name && value
+      )
+      .map((value) => {
+        let split = path.dirname(value).split(path.sep);
+        return {
+          id: split[split.length - 1],
+          dest: path.normalize(`${destination}/${value}`),
+        };
+      });
     return files;
-  } catch (err) {
-    throw new Error(err);
-  }
-};
-
-const downloadOne = async (type, id) => {
-  try {
-    const destination = `${__dirname}/../../uploads/${type}/${id}`;
-    let files = await new Promise((resolve, reject) =>
-      fs.readdir(destination, { recursive: true }, (err, files) => {
-        if (err) reject(err);
-        else resolve(files);
-      })
-    );
-    return `${destination}/${files[0]}`;
   } catch (err) {
     throw new Error(err);
   }
@@ -88,11 +83,69 @@ const upload = async (file, type, id) => {
   }
 };
 
+const updateFile = async (file, type, id) => {
+  try {
+    if (MAX_FILESIZE < file.size)
+      throw {
+        code: 400,
+        error: "File exceeds the max file size",
+      };
+    if (!FILETYPES.includes(file.mimetype))
+      throw {
+        code: 400,
+        error: "Unsupported file type",
+      };
+    const destination = `${__dirname}/../../uploads/${type}/${id}`;
+    const filePath = `${destination}/${await setID()}_${file.name}`;
+    await fs.open(destination, "r+", (err, fd) => {
+      try {
+        if (err) {
+          if (err.code === "ENOENT") {
+            fs.mkdir(destination, { recursive: true }, (err) => {
+              if (err) throw err;
+              else moveFile(file, filePath);
+            });
+          }
+        } else {
+          fs.readdir(destination, { recursive: true }, (err, files) => {
+            if (err) throw err;
+            files.forEach((file) =>
+              fs.unlink(path.join(destination, file), (err) => {
+                if (err) throw err;
+              })
+            );
+          });
+          moveFile(file, filePath);
+        }
+      } finally {
+        if (fd) {
+          fs.close(fd, (err) => {
+            if (err) throw err;
+          });
+        }
+      }
+    });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 const removeFile = async (type, id) => {
   try {
     const destination = `${__dirname}/../../uploads/${type}/${id}`;
-    await fs.rmdir(destination, (err) => {
-      if (err) throw err;
+    await fs.open(destination, "r+", (err, fd) => {
+      try {
+        if (!err)
+          fs.rm(destination, { recursive: true }, (err) => {
+            if (err) throw err;
+          });
+      } finally {
+        if (fd) {
+          fs.close(fd, (err) => {
+            if (err) throw err;
+          });
+        }
+      }
     });
   } catch (err) {
     throw new Error(err);
@@ -100,7 +153,7 @@ const removeFile = async (type, id) => {
 };
 module.exports = {
   upload,
-  downloadOne,
   downloadAll,
+  updateFile,
   removeFile,
 };

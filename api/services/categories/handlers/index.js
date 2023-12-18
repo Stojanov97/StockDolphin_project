@@ -1,7 +1,7 @@
+const path = require("path");
 const {
   create,
   read,
-  readByID,
   readByUserID,
   update,
   remove,
@@ -13,18 +13,19 @@ const {
 const { validate } = require("../../../pkg/validator");
 const {
   upload,
-  downloadOne,
   downloadAll,
+  updateFile,
   removeFile,
 } = require("../../../pkg/files");
 
 const createHandler = async (req, res) => {
   try {
     let userID = req.auth.id;
+    if (req.auth.admin === false) return res.status(401).send("Unauthorized");
     let credentials = { ...req.body, ...{ By: userID } };
     await validate(credentials, CategoryCreate);
     let category = await create(credentials);
-    await upload(req.files.photo, "cat", category._id);
+    req.files && upload(req.files.photo, "cat", category._id);
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -37,8 +38,15 @@ const readHandler = async (req, res) => {
   try {
     let categories = await read();
     let photos = await downloadAll("cat");
-    console.log(photos);
-    return await res.send("test");
+    categories = categories.map((cat) => {
+      return {
+        ...cat._doc,
+        ...{
+          photo: photos.find(({ id }) => id == cat._doc._id) || false,
+        },
+      };
+    });
+    return await res.json(categories);
   } catch (err) {
     return res
       .status(500 || err.code)
@@ -46,17 +54,20 @@ const readHandler = async (req, res) => {
   }
 };
 
-const readOneByIDHandler = async (req, res) => {
+const readByUserHandler = async (req, res) => {
   try {
-  } catch (err) {
-    return res
-      .status(500 || err.code)
-      .json({ success: false, err: err.message });
-  }
-};
-
-const readOneByUserHandler = async (req, res) => {
-  try {
+    let userID = req.auth.id;
+    let categories = await readByUserID(userID);
+    let photos = await downloadAll("cat");
+    categories = categories.map((cat) => {
+      return {
+        ...cat._doc,
+        ...{
+          photo: photos.find(({ id }) => id == cat._doc._id) || false,
+        },
+      };
+    });
+    return res.json(categories);
   } catch (err) {
     return res
       .status(500 || err.code)
@@ -66,6 +77,12 @@ const readOneByUserHandler = async (req, res) => {
 
 const updateHandler = async (req, res) => {
   try {
+    if (req.auth.admin === false) return res.status(401).send("Unauthorized");
+    const { id } = req.params;
+    await validate(req.body, CategoryUpdate);
+    await update(id, req.body);
+    req.files && updateFile(req.files.photo, "cat", id);
+    return await res.json({ success: true });
   } catch (err) {
     return res
       .status(500 || err.code)
@@ -75,6 +92,11 @@ const updateHandler = async (req, res) => {
 
 const deleteHandler = async (req, res) => {
   try {
+    if (req.auth.admin === false) return res.status(401).send("Unauthorized");
+    const { id } = req.params;
+    await remove(id);
+    await removeFile("cat", id);
+    return await res.json({ success: true });
   } catch (err) {
     return res
       .status(500 || err.code)
@@ -85,8 +107,7 @@ const deleteHandler = async (req, res) => {
 module.exports = {
   createHandler,
   readHandler,
-  readOneByUserHandler,
-  readOneByIDHandler,
+  readByUserHandler,
   updateHandler,
   deleteHandler,
 };

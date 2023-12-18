@@ -6,6 +6,7 @@ const {
   update,
   changePassword,
   remove,
+  readByID,
 } = require("../../../pkg/users");
 const {
   UserRegister,
@@ -142,6 +143,12 @@ const resetPasswordHandler = async (req, res) => {
     }
     if (newPassword !== confirmNewPassword) {
       return res.status(409).send("passwords don't match");
+    }
+    const user = await readByID(id);
+    if (await bcrypt.compare(newPassword, user.password)) {
+      return res
+        .status(400)
+        .send("New password can't be the same as the old one");
     }
     const password = await bcrypt.hash(
       newPassword,

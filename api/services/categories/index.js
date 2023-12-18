@@ -4,8 +4,7 @@ const config = require("../../pkg/config").get;
 const {
   createHandler,
   readHandler,
-  readOneByUserHandler,
-  readOneByIDHandler,
+  readByUserHandler,
   updateHandler,
   deleteHandler,
 } = require("./handlers");
@@ -35,7 +34,10 @@ service.use(
 );
 
 service.get("/api/v1/category", readHandler);
+service.get("/api/v1/category/user", readByUserHandler);
 service.post("/api/v1/category", createHandler);
+service.patch("/api/v1/category/:id", updateHandler);
+service.delete("/api/v1/category/:id", deleteHandler);
 
 service.listen(port, (err) =>
   err ? console.log(err) : console.log("Category service started successfully")
