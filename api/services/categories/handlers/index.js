@@ -29,8 +29,8 @@ const createHandler = async (req, res) => {
     return await res.json({ success: true });
   } catch (err) {
     return res
-      .status(500 || err.code)
-      .json({ success: false, err: err.message });
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 
@@ -49,8 +49,8 @@ const readHandler = async (req, res) => {
     return await res.json(categories);
   } catch (err) {
     return res
-      .status(500 || err.code)
-      .json({ success: false, err: err.message });
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 
@@ -70,8 +70,8 @@ const readByUserHandler = async (req, res) => {
     return res.json(categories);
   } catch (err) {
     return res
-      .status(500 || err.code)
-      .json({ success: false, err: err.message });
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 
@@ -85,8 +85,8 @@ const updateHandler = async (req, res) => {
     return await res.json({ success: true });
   } catch (err) {
     return res
-      .status(500 || err.code)
-      .json({ success: false, err: err.message });
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 
@@ -99,8 +99,8 @@ const deleteHandler = async (req, res) => {
     return await res.json({ success: true });
   } catch (err) {
     return res
-      .status(500 || err.code)
-      .json({ success: false, err: err.message });
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 

@@ -10,6 +10,7 @@ app.use(
   proxy(`http://127.0.0.1:${config("USERS_SERVICE_PORT")}`, {
     proxyReqPathResolver: (req) =>
       `http://127.0.0.1:${config("USERS_SERVICE_PORT")}/api/v1/auth${req.url}`,
+    limit: "5mb",
   })
 );
 
@@ -20,6 +21,7 @@ app.use(
       `http://127.0.0.1:${config("CATEGORIES_SERVICE_PORT")}/api/v1/category${
         req.url
       }`,
+    limit: "5mb",
   })
 );
 

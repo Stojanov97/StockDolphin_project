@@ -14,142 +14,136 @@ const setID = async () => {
 
 const moveFile = async (file, to) => {
   file.mv(to, (err) => {
-    if (err) throw err;
+    if (err) {
+      throw {
+        code: err.status,
+        error: err.message,
+      };
+    }
   });
 };
 
-const downloadAll = async (type) => {
-  try {
-    const destination = `${__dirname}/../../uploads/${type}`;
-    let files = await new Promise((resolve, reject) =>
-      fs.readdir(destination, { recursive: true }, (err, files) => {
-        if (err) reject(err);
-        else resolve(files);
-      })
-    );
-    files = files
-      .filter(
-        (value) => path.parse(value).base !== path.parse(value).name && value
-      )
-      .map((value) => {
-        let split = path.dirname(value).split(path.sep);
-        return {
-          id: split[split.length - 1],
-          dest: path.normalize(`${destination}/${value}`),
-        };
-      });
-    return files;
-  } catch (err) {
-    throw new Error(err);
-  }
+const downloadAll = (type) => {
+  const destination = `${__dirname}/../../uploads/${type}`;
+  let getFiles = new Promise((resolve, reject) =>
+    fs.readdir(destination, { recursive: true }, (err, files) => {
+      if (err) reject(err);
+      else resolve(files);
+    })
+  );
+  let files;
+  getFiles.then(
+    (x) =>
+      (files = x
+        .filter(
+          (value) => path.parse(value).base !== path.parse(value).name && value
+        )
+        .map((value) => {
+          let split = path.dirname(value).split(path.sep);
+          return {
+            id: split[split.length - 1],
+            dest: path.normalize(`${destination}/${value}`),
+          };
+        }))
+  );
+  return files;
 };
 
-const upload = async (file, type, id) => {
-  try {
-    if (MAX_FILESIZE < file.size)
-      throw {
-        code: 400,
-        error: "File exceeds the max file size",
-      };
-    if (!FILETYPES.includes(file.mimetype))
-      throw {
-        code: 400,
-        error: "Unsupported file type",
-      };
-    const destination = `${__dirname}/../../uploads/${type}/${id}`;
-    const filePath = `${destination}/${await setID()}_${file.name}`;
-    await fs.open(destination, "r+", (err, fd) => {
-      try {
-        if (err) {
-          if (err.code === "EEXIST") {
-            moveFile(file, filePath);
-          } else if (err.code === "ENOENT") {
-            fs.mkdir(destination, { recursive: true }, (err) => {
-              if (err) throw err;
-              else moveFile(file, filePath);
-            });
-          }
-        }
-      } finally {
-        if (fd) {
-          fs.close(fd, (err) => {
-            if (err) throw err;
-          });
-        }
-      }
-    });
-  } catch (err) {
-    throw new Error(err);
-  }
-};
-
-const updateFile = async (file, type, id) => {
-  try {
-    if (MAX_FILESIZE < file.size)
-      throw {
-        code: 400,
-        error: "File exceeds the max file size",
-      };
-    if (!FILETYPES.includes(file.mimetype))
-      throw {
-        code: 400,
-        error: "Unsupported file type",
-      };
-    const destination = `${__dirname}/../../uploads/${type}/${id}`;
-    const filePath = `${destination}/${await setID()}_${file.name}`;
-    await fs.open(destination, "r+", (err, fd) => {
-      try {
-        if (err) {
-          if (err.code === "ENOENT") {
-            fs.mkdir(destination, { recursive: true }, (err) => {
-              if (err) throw err;
-              else moveFile(file, filePath);
-            });
-          }
-        } else {
-          fs.readdir(destination, { recursive: true }, (err, files) => {
-            if (err) throw err;
-            files.forEach((file) =>
-              fs.unlink(path.join(destination, file), (err) => {
-                if (err) throw err;
-              })
-            );
-          });
+const upload = (file, type, id) => {
+  console.log("Got in upload");
+  if (MAX_FILESIZE < file.size)
+    throw {
+      code: 413,
+      error: "File exceeds the max file size",
+    };
+  if (!FILETYPES.includes(file.mimetype))
+    throw {
+      code: 400,
+      error: "Unsupported file type",
+    };
+  const destination = `${__dirname}/../../uploads/${type}/${id}`;
+  const filePath = `${destination}/${setID()}_${file.name}`;
+  fs.open(destination, "r+", (err, fd) => {
+    try {
+      if (err) {
+        if (err.code === "EEXIST") {
           moveFile(file, filePath);
-        }
-      } finally {
-        if (fd) {
-          fs.close(fd, (err) => {
+        } else if (err.code === "ENOENT") {
+          fs.mkdir(destination, { recursive: true }, (err) => {
             if (err) throw err;
+            else moveFile(file, filePath);
           });
         }
       }
-    });
-  } catch (err) {
-    throw new Error(err);
-  }
+    } finally {
+      if (fd) {
+        fs.close(fd, (err) => {
+          if (err) throw err;
+        });
+      }
+    }
+  });
 };
 
-const removeFile = async (type, id) => {
-  try {
-    const destination = `${__dirname}/../../uploads/${type}/${id}`;
-    await fs.open(destination, "r+", (err, fd) => {
-      try {
-        if (!err)
-          fs.rm(destination, { recursive: true }, (err) => {
+const updateFile = (file, type, id) => {
+  if (MAX_FILESIZE < file.size)
+    throw {
+      code: 413,
+      error: "File exceeds the max file size",
+    };
+  if (!FILETYPES.includes(file.mimetype))
+    throw {
+      code: 400,
+      error: "Unsupported file type",
+    };
+  const destination = `${__dirname}/../../uploads/${type}/${id}`;
+  const filePath = `${destination}/${setID()}_${file.name}`;
+  fs.open(destination, "r+", (err, fd) => {
+    try {
+      if (err) {
+        if (err.code === "ENOENT") {
+          fs.mkdir(destination, { recursive: true }, (err) => {
             if (err) throw err;
-          });
-      } finally {
-        if (fd) {
-          fs.close(fd, (err) => {
-            if (err) throw err;
+            else moveFile(file, filePath);
           });
         }
+      } else {
+        fs.readdir(destination, { recursive: true }, (err, files) => {
+          if (err) throw err;
+          files.forEach((file) =>
+            fs.unlink(path.join(destination, file), (err) => {
+              if (err) throw err;
+            })
+          );
+        });
+        moveFile(file, filePath);
       }
-    });
-  } catch (err) {
-    throw new Error(err);
-  }
+    } finally {
+      if (fd) {
+        fs.close(fd, (err) => {
+          if (err) throw err;
+        });
+      }
+    }
+  });
+};
+
+const removeFile = (type, id) => {
+  const destination = `${__dirname}/../../uploads/${type}/${id}`;
+  fs.open(destination, "r+", (err, fd) => {
+    try {
+      if (!err)
+        fs.rm(destination, { recursive: true }, (err) => {
+          if (err) throw err;
+        });
+    } finally {
+      if (fd) {
+        fs.close(fd, (err) => {
+          if (err) throw err;
+        });
+      }
+    }
+  });
 };
 module.exports = {
   upload,

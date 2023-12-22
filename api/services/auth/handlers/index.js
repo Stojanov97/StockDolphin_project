@@ -62,7 +62,7 @@ const registerHandler = async (req, res) => {
   } catch (err) {
     return res
       .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.message });
+      .json({ success: false, err: "Internal server error" || err.error });
   }
 };
 
@@ -99,7 +99,7 @@ const loginHandler = async (req, res) => {
   } catch (err) {
     return res
       .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.message });
+      .json({ success: false, err: "Internal server error" || err.error });
   }
 };
 
@@ -112,7 +112,7 @@ const updateCredentialsHandler = async (req, res) => {
   } catch (err) {
     return res
       .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.message });
+      .json({ success: false, err: "Internal server error" || err.error });
   }
 };
 
@@ -129,7 +129,7 @@ const requestResetPasswordHandler = async (req, res) => {
   } catch (err) {
     return res
       .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.message });
+      .json({ success: false, err: "Internal server error" || err.error });
   }
 };
 
@@ -159,7 +159,7 @@ const resetPasswordHandler = async (req, res) => {
   } catch (err) {
     return res
       .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.message });
+      .json({ success: false, err: "Internal server error" || err.error });
   }
 };
 
@@ -173,7 +173,7 @@ const deleteHandler = async (req, res) => {
   } catch (err) {
     return res
       .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.message });
+      .json({ success: false, err: "Internal server error" || err.error });
   }
 };
 
@@ -185,7 +185,7 @@ const logoutHandler = async (req, res) => {
   } catch (err) {
     return res
       .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.message });
+      .json({ success: false, err: "Internal server error" || err.error });
   }
 };
 
@@ -196,7 +196,7 @@ const readAllHandler = async (req, res) => {
   } catch (err) {
     return res
       .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.message });
+      .json({ success: false, err: "Internal server error" || err.error });
   }
 };
 
