@@ -32,20 +32,19 @@ service.use(
     path: [
       "/api/v1/auth/register",
       "/api/v1/auth/login",
-      { url: "/api/v1/auth", methods: ["GET", "POST", "DELETE"] },
+      { url: "/api/v1/auth/", methods: ["GET", "POST"] },
       { url: /^\/api\/v1\/auth\/.*/, method: "PATCH" },
     ],
   })
 );
 
 service.get("/api/v1/auth", readAllHandler);
-service.delete("/api/v1/auth/:id", deleteHandler);
-
 service.post("/api/v1/auth/register", registerHandler);
 service.post("/api/v1/auth/login", loginHandler);
 service.post("/api/v1/auth", requestResetPasswordHandler);
 service.patch("/api/v1/auth/:id", resetPasswordHandler);
 service.put("/api/v1/auth", updateCredentialsHandler);
+service.delete("/api/v1/auth/:id", deleteHandler);
 service.delete("/api/v1/auth", logoutHandler);
 
 service.listen(port, (err) =>

@@ -1,6 +1,6 @@
 const { Validator } = require("node-input-validator");
 
-const validate = async (data, schema) => {
+const validate = (data, schema) => {
   let validator = new Validator(data, schema);
   let validated = validator.check();
   if (!validated) {

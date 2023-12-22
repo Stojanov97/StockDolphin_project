@@ -21,10 +21,12 @@ const {
 const createHandler = async (req, res) => {
   try {
     let userID = req.auth.id;
-    if (req.auth.admin === false) return res.status(401).send("Unauthorized");
+    if (req.auth.admin === false)
+      throw { code: 401, error: "You aren't an admin" };
     let credentials = { ...req.body, ...{ By: userID } };
     await validate(credentials, CategoryCreate);
     let category = await create(credentials);
+    // console.log(req.files);
     req.files && upload(req.files.photo, "cat", category._id);
     return await res.json({ success: true });
   } catch (err) {
@@ -38,6 +40,7 @@ const readHandler = async (req, res) => {
   try {
     let categories = await read();
     let photos = await downloadAll("cat");
+    console.log(photos);
     categories = categories.map((cat) => {
       return {
         ...cat._doc,

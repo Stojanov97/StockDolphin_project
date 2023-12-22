@@ -31,9 +31,20 @@ const registerHandler = async (req, res) => {
     await validate(req.body, UserRegister);
     const { username, email } = req.body;
     if (await readByUsername(username))
-      return res.status(409).send("username taken");
+      throw {
+        code: 409,
+        error: "username taken",
+      };
     if (await readByEmail(email))
-      return res.status(409).send("email already in use");
+      throw {
+        code: 409,
+        error: "email already in use",
+      };
+    if (req.body.password.length < 8)
+      throw {
+        code: 409,
+        error: "The password must be at least 8 characters long",
+      };
     req.body.password = await bcrypt.hash(
       req.body.password,
       parseInt(config("HASHING_SALT"))
@@ -42,6 +53,7 @@ const registerHandler = async (req, res) => {
     const payload = {
       username: username,
       email: email,
+      admin: user.admin,
       id: user._id,
     };
     const token = await jwt.sign(payload, secret, { expiresIn: "30s" });
@@ -61,8 +73,8 @@ const registerHandler = async (req, res) => {
       .json({ logged: true });
   } catch (err) {
     return res
-      .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.error });
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 
@@ -71,11 +83,16 @@ const loginHandler = async (req, res) => {
     await validate(req.body, UserLogin);
     const { email, password } = req.body;
     const user = await readByEmail(email);
-    if (!user) {
-      return res.status(404).send("user not found");
-    }
+    if (!user)
+      throw {
+        code: 404,
+        error: "user not found",
+      };
     if (!(await bcrypt.compare(password, user.password)))
-      return res.status(401).send("wrong password");
+      throw {
+        code: 401,
+        error: "wrong password",
+      };
     const payload = {
       username: user.username,
       email: email,
@@ -98,8 +115,8 @@ const loginHandler = async (req, res) => {
       .json({ logged: true });
   } catch (err) {
     return res
-      .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.error });
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 
@@ -111,8 +128,8 @@ const updateCredentialsHandler = async (req, res) => {
     return res.status(200).json({ success: true });
   } catch (err) {
     return res
-      .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.error });
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 
@@ -128,8 +145,8 @@ const requestResetPasswordHandler = async (req, res) => {
     return res.status(200).json({ sent: true });
   } catch (err) {
     return res
-      .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.error });
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 
@@ -158,22 +175,22 @@ const resetPasswordHandler = async (req, res) => {
     return res.status(200).json({ success: true });
   } catch (err) {
     return res
-      .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.error });
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 
 const deleteHandler = async (req, res) => {
   try {
     const token = req.auth;
-    if (token.admin != true) throw new Error("you are not an admin");
+    if (token.admin != true) throw { code: 401, error: "You are not an admin" };
     const id = req.params.id;
     await remove(id);
     return res.status(200).json({ success: true });
   } catch (err) {
     return res
-      .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.error });
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 
@@ -184,8 +201,8 @@ const logoutHandler = async (req, res) => {
     return res.json({ logged: false });
   } catch (err) {
     return res
-      .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.error });
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 
@@ -195,8 +212,8 @@ const readAllHandler = async (req, res) => {
     return await res.json(users);
   } catch (err) {
     return res
-      .status(500 || err.code)
-      .json({ success: false, err: "Internal server error" || err.error });
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 

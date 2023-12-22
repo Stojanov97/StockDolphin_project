@@ -5,14 +5,14 @@ const chars = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
 const MAX_FILESIZE = 2097152;
 const FILETYPES = ["image/jpg", "image/jpeg"];
 
-const setID = async () => {
+const setID = () => {
   let ID = "";
   for (let i = 0; i < 10; i++)
     ID += chars.charAt(Math.floor(Math.random() * chars.length));
   return ID;
 };
 
-const moveFile = async (file, to) => {
+const moveFile = (file, to) => {
   file.mv(to, (err) => {
     if (err) {
       throw {
@@ -23,30 +23,30 @@ const moveFile = async (file, to) => {
   });
 };
 
-const downloadAll = (type) => {
-  const destination = `${__dirname}/../../uploads/${type}`;
-  let getFiles = new Promise((resolve, reject) =>
-    fs.readdir(destination, { recursive: true }, (err, files) => {
-      if (err) reject(err);
-      else resolve(files);
-    })
-  );
-  let files;
-  getFiles.then(
-    (x) =>
-      (files = x
-        .filter(
-          (value) => path.parse(value).base !== path.parse(value).name && value
-        )
-        .map((value) => {
-          let split = path.dirname(value).split(path.sep);
-          return {
-            id: split[split.length - 1],
-            dest: path.normalize(`${destination}/${value}`),
-          };
-        }))
-  );
-  return files;
+const downloadAll = async (type) => {
+  try {
+    const destination = `${__dirname}/../../uploads/${type}`;
+    let files = await fs.promises.readdir(destination, { recursive: true });
+    files = files
+      .filter(
+        (value) => path.parse(value).base !== path.parse(value).name && value
+      )
+      .map((value) => {
+        let split = path.dirname(value).split(path.sep);
+        return {
+          id: split[split.length - 1],
+          dest: path.normalize(`${destination}/${value}`),
+        };
+      });
+
+    return files;
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      return [];
+    } else {
+      throw { error: err };
+    }
+  }
 };
 
 const upload = (file, type, id) => {
@@ -70,15 +70,17 @@ const upload = (file, type, id) => {
           moveFile(file, filePath);
         } else if (err.code === "ENOENT") {
           fs.mkdir(destination, { recursive: true }, (err) => {
-            if (err) throw err;
+            if (err) throw { error: err };
             else moveFile(file, filePath);
           });
+        } else {
+          throw err;
         }
       }
     } finally {
       if (fd) {
         fs.close(fd, (err) => {
-          if (err) throw err;
+          if (err) throw { error: err };
         });
       }
     }
