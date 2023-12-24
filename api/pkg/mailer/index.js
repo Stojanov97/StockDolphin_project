@@ -15,11 +15,12 @@ const readFile = (template) => {
   );
 };
 
-function Mail(to, subject, html) {
+function Mail(to, subject, html, text) {
   this.to = to;
   this.from = "stojanov091@gmail.com";
   this.subject = subject;
   this.html = html;
+  this.text = text;
 }
 
 const welcomeTemplate = async (username) => {
@@ -36,7 +37,9 @@ const resetTemplate = async (username, id) => {
 
 const sendMail = async (to, subject, template) => {
   try {
-    await mailer.send(new Mail(to, subject, await template));
+    let html = await template;
+    let text = await html.replaceAll(/(<([^>]+)>)/gi, "");
+    await mailer.send(new Mail(to, subject, html, text));
   } catch (err) {
     throw new Error(err);
   }
