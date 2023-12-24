@@ -4,7 +4,6 @@ const {
   read,
   readByUserID,
   update,
-  move,
   remove,
 } = require("../../../pkg/items");
 const { ItemCreate, ItemUpdate } = require("../../../pkg/items/validate");
@@ -23,7 +22,7 @@ const createHandler = async (req, res) => {
       throw { code: 401, error: "You aren't an admin" };
     let data = {
       ...req.body,
-      ...{ By: userID, category: req.params.category },
+      ...{ By: userID },
     };
     await validate(data, ItemCreate);
     let item = await create(data);

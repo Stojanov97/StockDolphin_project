@@ -2,8 +2,10 @@ const mongoose = require("mongoose");
 
 const OrderScheme = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    category: {
+    supplier: { type: String, required: true },
+    quantity: { type: Number, required: true },
+    price: { type: Number, required: true },
+    item: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "item",
     },
@@ -34,9 +36,9 @@ const read = async () => {
   }
 };
 
-const readByUserID = async (id) => {
+const readByItemID = async (id) => {
   try {
-    return await order.find({ By: id });
+    return await order.find({ item: id });
   } catch (err) {
     throw new Error(err);
   }
@@ -50,18 +52,9 @@ const update = async (id, data) => {
   }
 };
 
-const remove = async (id) => {
-  try {
-    return await order.deleteOne({ _id: id });
-  } catch (err) {
-    throw new Error(err);
-  }
-};
-
 module.exports = {
   create,
   read,
-  readByUserID,
+  readByItemID,
   update,
-  remove,
 };

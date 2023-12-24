@@ -4,7 +4,7 @@ const config = require("../../pkg/config").get;
 const {
   createHandler,
   readHandler,
-  readByUserHandler,
+  readByItemHandler,
   updateHandler,
   deleteHandler,
 } = require("./handlers");
@@ -14,7 +14,7 @@ const fileUpload = require("express-fileupload");
 const { tokenRefresher } = require("../../pkg/tokenMiddleware");
 const { expressjwt: jwt } = require("express-jwt");
 const service = express();
-const port = config("ITEMS_SERVICE_PORT");
+const port = config("ORDERS_SERVICE_PORT");
 
 service.use(express.json());
 service.use(fileUpload());
@@ -29,16 +29,18 @@ service.use(
       return token ? token : null;
     },
   }).unless({
-    path: [{ url: "/api/v1/item/", method: "GET" }],
+    path: [
+      { url: "/api/v1/order/", method: "GET" },
+      { url: /^\/api\/v1\/order\/.*/, method: "GET" },
+    ],
   })
 );
 
-service.get("/api/v1/item", readHandler);
-service.get("/api/v1/item/user", readByUserHandler);
-service.post("/api/v1/item", createHandler);
-service.patch("/api/v1/item/:id", updateHandler);
-service.delete("/api/v1/item/:id", deleteHandler);
+service.get("/api/v1/order", readHandler);
+service.get("/api/v1/order/:item", readByItemHandler);
+service.post("/api/v1/order", createHandler);
+service.patch("/api/v1/order/:id", updateHandler);
 
 service.listen(port, (err) =>
-  err ? console.log(err) : console.log("Items service started successfully")
+  err ? console.log(err) : console.log("Orders service started successfully")
 );
