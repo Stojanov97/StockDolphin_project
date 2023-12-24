@@ -4,12 +4,10 @@ const {
   read,
   readByUserID,
   update,
+  move,
   remove,
-} = require("../../../pkg/categories");
-const {
-  CategoryCreate,
-  CategoryUpdate,
-} = require("../../../pkg/categories/validate");
+} = require("../../../pkg/items");
+const { ItemCreate, ItemUpdate } = require("../../../pkg/items/validate");
 const { validate } = require("../../../pkg/validator");
 const {
   upload,
@@ -23,11 +21,14 @@ const createHandler = async (req, res) => {
     let userID = req.auth.id;
     if (req.auth.admin === false)
       throw { code: 401, error: "You aren't an admin" };
-    let data = { ...req.body, ...{ By: userID } };
-    await validate(data, CategoryCreate);
-    let category = await create(data);
+    let data = {
+      ...req.body,
+      ...{ By: userID, category: req.params.category },
+    };
+    await validate(data, ItemCreate);
+    let item = await create(data);
     // console.log(req.files);
-    req.files && upload(req.files.photo, "cat", category._id);
+    req.files && upload(req.files.photo, "item", item._id);
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -38,18 +39,18 @@ const createHandler = async (req, res) => {
 
 const readHandler = async (req, res) => {
   try {
-    let categories = await read();
-    let photos = await downloadAll("cat");
+    let items = await read();
+    let photos = await downloadAll("item");
     console.log(photos);
-    categories = categories.map((cat) => {
+    items = items.map((item) => {
       return {
-        ...cat._doc,
+        ...item._doc,
         ...{
-          photo: photos.find(({ id }) => id == cat._doc._id) || false,
+          photo: photos.find(({ id }) => id == item._doc._id) || false,
         },
       };
     });
-    return await res.json(categories);
+    return await res.json(items);
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -60,17 +61,17 @@ const readHandler = async (req, res) => {
 const readByUserHandler = async (req, res) => {
   try {
     let userID = req.auth.id;
-    let categories = await readByUserID(userID);
-    let photos = await downloadAll("cat");
-    categories = categories.map((cat) => {
+    let items = await readByUserID(userID);
+    let photos = await downloadAll("item");
+    items = items.map((item) => {
       return {
-        ...cat._doc,
+        ...item._doc,
         ...{
-          photo: photos.find(({ id }) => id == cat._doc._id) || false,
+          photo: photos.find(({ id }) => id == item._doc._id) || false,
         },
       };
     });
-    return res.json(categories);
+    return res.json(items);
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -83,9 +84,9 @@ const updateHandler = async (req, res) => {
     if (req.auth.admin === false)
       throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
-    await validate(req.body, CategoryUpdate);
+    await validate(req.body, ItemUpdate);
     await update(id, req.body);
-    req.files && updateFile(req.files.photo, "cat", id);
+    req.files && updateFile(req.files.photo, "item", id);
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -100,7 +101,7 @@ const deleteHandler = async (req, res) => {
       throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
     await remove(id);
-    await removeFile("cat", id);
+    await removeFile("item", id);
     return await res.json({ success: true });
   } catch (err) {
     return res

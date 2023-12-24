@@ -14,7 +14,7 @@ const fileUpload = require("express-fileupload");
 const { tokenRefresher } = require("../../pkg/tokenMiddleware");
 const { expressjwt: jwt } = require("express-jwt");
 const service = express();
-const port = config("CATEGORIES_SERVICE_PORT");
+const port = config("ITEMS_SERVICE_PORT");
 
 service.use(express.json());
 service.use(fileUpload());
@@ -29,16 +29,16 @@ service.use(
       return token ? token : null;
     },
   }).unless({
-    path: [{ url: "/api/v1/category/", method: "GET" }],
+    path: [{ url: "/api/v1/item/", method: "GET" }],
   })
 );
 
-service.get("/api/v1/category", readHandler);
-service.get("/api/v1/category/user", readByUserHandler);
-service.post("/api/v1/category", createHandler);
-service.patch("/api/v1/category/:id", updateHandler);
-service.delete("/api/v1/category/:id", deleteHandler);
+service.get("/api/v1/item", readHandler);
+service.get("/api/v1/item/user", readByUserHandler);
+service.post("/api/v1/item/:category", createHandler);
+service.patch("/api/v1/item/:id", updateHandler);
+service.delete("/api/v1/item/:id", deleteHandler);
 
 service.listen(port, (err) =>
-  err ? console.log(err) : console.log("Category service started successfully")
+  err ? console.log(err) : console.log("Items service started successfully")
 );

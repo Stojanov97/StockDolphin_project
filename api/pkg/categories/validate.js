@@ -4,8 +4,7 @@ const CategoryCreate = {
 };
 
 const CategoryUpdate = {
-  name: "required",
-  photo: "required",
+  name: "string",
 };
 
 module.exports = {
