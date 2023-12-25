@@ -29,15 +29,15 @@ service.use(
       return token ? token : null;
     },
   }).unless({
-    path: [{ url: "/api/v1/item/", method: "GET" }],
+    path: [{ url: "/api/v1/items/", method: "GET" }],
   })
 );
 
-service.get("/api/v1/item", readHandler);
-service.get("/api/v1/item/user", readByUserHandler);
-service.post("/api/v1/item", createHandler);
-service.patch("/api/v1/item/:id", updateHandler);
-service.delete("/api/v1/item/:id", deleteHandler);
+service.get("/api/v1/items", readHandler);
+service.get("/api/v1/items/user", readByUserHandler);
+service.post("/api/v1/items", createHandler);
+service.patch("/api/v1/items/:id", updateHandler);
+service.delete("/api/v1/items/:id", deleteHandler);
 
 service.listen(port, (err) =>
   err ? console.log(err) : console.log("Items service started successfully")

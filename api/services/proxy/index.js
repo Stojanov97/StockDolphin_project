@@ -1,11 +1,9 @@
-const path = require("path");
 const proxy = require("express-http-proxy");
 const express = require("express");
 const config = require("../../pkg/config").get;
-const { tokenRefresher } = require("../../pkg/tokenMiddleware");
 
 const app = express();
-// app.use(tokenRefresher);
+
 app.use(
   "/api/v1/auth",
   proxy(`http://127.0.0.1:${config("USERS_SERVICE_PORT")}`, {
@@ -17,10 +15,10 @@ app.use(
 );
 
 app.use(
-  "/api/v1/category",
+  "/api/v1/categories",
   proxy(`http://127.0.0.1:${config("CATEGORIES_SERVICE_PORT")}`, {
     proxyReqPathResolver: (req) =>
-      `http://127.0.0.1:${config("CATEGORIES_SERVICE_PORT")}/api/v1/category${
+      `http://127.0.0.1:${config("CATEGORIES_SERVICE_PORT")}/api/v1/categories${
         req.url
       }`,
     limit: "35mb",
@@ -28,19 +26,19 @@ app.use(
 );
 
 app.use(
-  "/api/v1/item",
+  "/api/v1/items",
   proxy(`http://127.0.0.1:${config("ITEMS_SERVICE_PORT")}`, {
     proxyReqPathResolver: (req) =>
-      `http://127.0.0.1:${config("ITEMS_SERVICE_PORT")}/api/v1/item${req.url}`,
+      `http://127.0.0.1:${config("ITEMS_SERVICE_PORT")}/api/v1/items${req.url}`,
     limit: "35mb",
   })
 );
 
 app.use(
-  "/api/v1/order",
+  "/api/v1/orders",
   proxy(`http://127.0.0.1:${config("ORDERS_SERVICE_PORT")}`, {
     proxyReqPathResolver: (req) =>
-      `http://127.0.0.1:${config("ORDERS_SERVICE_PORT")}/api/v1/order${
+      `http://127.0.0.1:${config("ORDERS_SERVICE_PORT")}/api/v1/orders${
         req.url
       }`,
   })

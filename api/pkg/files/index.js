@@ -50,7 +50,6 @@ const downloadAll = async (type) => {
 };
 
 const upload = (file, type, id) => {
-  console.log("Got in upload");
   if (MAX_FILESIZE < file.size)
     throw {
       code: 413,

@@ -27,16 +27,16 @@ service.use(
     },
   }).unless({
     path: [
-      { url: "/api/v1/order/", method: "GET" },
-      { url: /^\/api\/v1\/order\/.*/, method: "GET" },
+      { url: "/api/v1/orders/", method: "GET" },
+      { url: /^\/api\/v1\/orders\/.*/, method: "GET" },
     ],
   })
 );
 
-service.get("/api/v1/order", readHandler);
-service.get("/api/v1/order/:item", readByItemHandler);
-service.post("/api/v1/order", createHandler);
-service.patch("/api/v1/order/:id", updateHandler);
+service.get("/api/v1/orders", readHandler);
+service.get("/api/v1/orders/:item", readByItemHandler);
+service.post("/api/v1/orders", createHandler);
+service.patch("/api/v1/orders/:id", updateHandler);
 
 service.listen(port, (err) =>
   err ? console.log(err) : console.log("Orders service started successfully")

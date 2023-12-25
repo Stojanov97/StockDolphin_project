@@ -25,7 +25,6 @@ const createHandler = async (req, res) => {
     };
     await validate(data, ItemCreate);
     let item = await create(data);
-    // console.log(req.files);
     req.files && upload(req.files.photo, "item", item._id);
     return await res.json({ success: true });
   } catch (err) {
@@ -39,7 +38,6 @@ const readHandler = async (req, res) => {
   try {
     let items = await read();
     let photos = await downloadAll("item");
-    console.log(photos);
     items = items.map((item) => {
       return {
         ...item._doc,

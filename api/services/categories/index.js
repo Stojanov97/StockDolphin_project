@@ -29,15 +29,15 @@ service.use(
       return token ? token : null;
     },
   }).unless({
-    path: [{ url: "/api/v1/category/", method: "GET" }],
+    path: [{ url: "/api/v1/categories/", method: "GET" }],
   })
 );
 
-service.get("/api/v1/category", readHandler);
-service.get("/api/v1/category/user", readByUserHandler);
-service.post("/api/v1/category", createHandler);
-service.patch("/api/v1/category/:id", updateHandler);
-service.delete("/api/v1/category/:id", deleteHandler);
+service.get("/api/v1/categories", readHandler);
+service.get("/api/v1/categories/user", readByUserHandler);
+service.post("/api/v1/categories", createHandler);
+service.patch("/api/v1/categories/:id", updateHandler);
+service.delete("/api/v1/categories/:id", deleteHandler);
 
 service.listen(port, (err) =>
   err ? console.log(err) : console.log("Category service started successfully")
