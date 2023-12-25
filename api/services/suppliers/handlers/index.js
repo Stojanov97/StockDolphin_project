@@ -1,5 +1,14 @@
-const { create, read, readByItemID, update } = require("../../../pkg/orders");
-const { OrderCreate, OrderUpdate } = require("../../../pkg/orders/validate");
+const {
+  create,
+  read,
+  readByID,
+  update,
+  remove,
+} = require("../../../pkg/suppliers");
+const {
+  SupplierCreate,
+  SupplierUpdate,
+} = require("../../../pkg/suppliers/validate");
 const { validate } = require("../../../pkg/validator");
 
 const createHandler = async (req, res) => {
@@ -7,11 +16,8 @@ const createHandler = async (req, res) => {
     let userID = req.auth.id;
     if (req.auth.admin === false)
       throw { code: 401, error: "You aren't an admin" };
-    let data = {
-      ...req.body,
-      ...{ By: userID },
-    };
-    await validate(data, OrderCreate);
+    let data = { ...req.body, ...{ By: userID } };
+    await validate(data, SupplierCreate);
     await create(data);
     return await res.json({ success: true });
   } catch (err) {
@@ -31,9 +37,14 @@ const readHandler = async (req, res) => {
   }
 };
 
-const readByItemHandler = async (req, res) => {
+const updateHandler = async (req, res) => {
   try {
-    return res.json(await readByItemID(req.params.item));
+    if (req.auth.admin === false)
+      throw { code: 401, error: "You aren't an admin" };
+    const { id } = req.params;
+    await validate(req.body, SupplierUpdate);
+    await update(id, req.body);
+    return await res.json({ success: true });
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -41,14 +52,11 @@ const readByItemHandler = async (req, res) => {
   }
 };
 
-const updateHandler = async (req, res) => {
+const deleteHandler = async (req, res) => {
   try {
     if (req.auth.admin === false)
       throw { code: 401, error: "You aren't an admin" };
-    const { id } = req.params;
-    if (req.body.item) throw { code: 400, error: "You can't change the item" };
-    await validate(req.body, OrderUpdate);
-    await update(id, req.body);
+    await remove(req.params.id);
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -60,6 +68,6 @@ const updateHandler = async (req, res) => {
 module.exports = {
   createHandler,
   readHandler,
-  readByItemHandler,
   updateHandler,
+  deleteHandler,
 };

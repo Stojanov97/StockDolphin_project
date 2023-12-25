@@ -46,6 +46,17 @@ app.use(
   })
 );
 
+app.use(
+  "/api/v1/suppliers",
+  proxy(`http://127.0.0.1:${config("SUPPLIERS_SERVICE_PORT")}`, {
+    proxyReqPathResolver: (req) =>
+      `http://127.0.0.1:${config("SUPPLIERS_SERVICE_PORT")}/api/v1/suppliers${
+        req.url
+      }`,
+    limit: "35mb",
+  })
+);
+
 const PORT = config("APP_PORT") || 3000;
 
 app.listen(PORT, (err) =>

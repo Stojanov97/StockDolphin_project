@@ -7,6 +7,7 @@ const ItemCreate = {
 const ItemUpdate = {
   name: "string",
   category: "string",
+  By: "string",
 };
 
 module.exports = {

@@ -3,8 +3,13 @@ const mongoose = require("mongoose");
 const OrderScheme = new mongoose.Schema(
   {
     supplier: { type: String, required: true },
+    supplierId: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "supplier",
+    },
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
+    date: { type: Date, required: true },
     item: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "item",

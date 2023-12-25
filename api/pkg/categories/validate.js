@@ -5,6 +5,7 @@ const CategoryCreate = {
 
 const CategoryUpdate = {
   name: "string",
+  By: "string",
 };
 
 module.exports = {
