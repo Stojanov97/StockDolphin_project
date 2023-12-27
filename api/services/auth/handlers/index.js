@@ -56,13 +56,13 @@ const registerHandler = async (req, res) => {
       admin: user.admin,
       id: user._id,
     };
-    const token = await jwt.sign(payload, secret, { expiresIn: "30s" });
+    const token = await jwt.sign(payload, secret, { expiresIn: "30min" });
     const refreshToken = await jwt.sign(payload, refreshSecret, {
       expiresIn: "24h",
     });
     sendMail(email, "Welcome To Our Platform", welcomeTemplate(username));
     await res.cookie("token", token, {
-      expires: new Date(Date.now() + 30000),
+      expires: new Date(Date.now() + 1800000),
       httpOnly: true,
     });
     return await res
@@ -99,12 +99,12 @@ const loginHandler = async (req, res) => {
       admin: user.admin,
       id: user._id,
     };
-    const token = await jwt.sign(payload, secret, { expiresIn: "30s" });
+    const token = await jwt.sign(payload, secret, { expiresIn: "30min" });
     const refreshToken = await jwt.sign(payload, refreshSecret, {
       expiresIn: "24h",
     });
     await res.cookie("token", token, {
-      expires: new Date(Date.now() + 30000),
+      expires: new Date(Date.now() + 1800000),
       httpOnly: true,
     });
     return await res
@@ -217,6 +217,30 @@ const readAllHandler = async (req, res) => {
   }
 };
 
+const refreshToken = async (req, res) => {
+  try {
+    if (!req.cookies.token && req.cookies.refreshToken) {
+      const { iat, exp, ...payload } = jwt.verify(
+        req.cookies.refreshToken,
+        config("REFRESH_JWT_SECRET")
+      );
+      let token = jwt.sign(payload, config("JWT_SECRET"), {
+        expiresIn: "30min",
+      });
+      req.refreshAccessToken = token;
+      await res.cookie("token", token, {
+        expires: new Date(Date.now() + 1800000),
+        httpOnly: true,
+      });
+      return res.status(200).json({ success: true, msg: "Token refreshed" });
+    }
+  } catch (err) {
+    return res
+      .status(err.code || 500)
+      .json({ success: false, err: err || "Internal server error" });
+  }
+};
+
 module.exports = {
   registerHandler,
   loginHandler,
@@ -226,4 +250,5 @@ module.exports = {
   deleteHandler,
   logoutHandler,
   readAllHandler,
+  refreshToken,
 };

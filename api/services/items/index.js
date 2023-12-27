@@ -11,7 +11,6 @@ const {
 
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
-const { tokenRefresher } = require("../../pkg/tokenMiddleware");
 const { expressjwt: jwt } = require("express-jwt");
 const service = express();
 const port = config("ITEMS_SERVICE_PORT");
@@ -19,14 +18,12 @@ const port = config("ITEMS_SERVICE_PORT");
 service.use(express.json());
 service.use(fileUpload());
 service.use(cookieParser());
-service.use(tokenRefresher);
 service.use(
   jwt({
     secret: config("JWT_SECRET"),
     algorithms: ["HS256"],
     getToken: function (req) {
-      let token = req.cookies.token || req.refreshAccessToken;
-      return token ? token : null;
+      return req.cookies.token;
     },
   }).unless({
     path: [{ url: "/api/v1/items/", method: "GET" }],

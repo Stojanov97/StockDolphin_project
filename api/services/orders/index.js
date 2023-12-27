@@ -9,21 +9,18 @@ const {
 } = require("./handlers");
 
 const cookieParser = require("cookie-parser");
-const { tokenRefresher } = require("../../pkg/tokenMiddleware");
 const { expressjwt: jwt } = require("express-jwt");
 const service = express();
 const port = config("ORDERS_SERVICE_PORT");
 
 service.use(express.json());
 service.use(cookieParser());
-service.use(tokenRefresher);
 service.use(
   jwt({
     secret: config("JWT_SECRET"),
     algorithms: ["HS256"],
     getToken: function (req) {
-      let token = req.cookies.token || req.refreshAccessToken;
-      return token ? token : null;
+      return req.cookies.token;
     },
   }).unless({
     path: [
