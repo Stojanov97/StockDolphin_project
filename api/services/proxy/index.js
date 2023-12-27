@@ -51,7 +51,6 @@ app.use(
       `http://127.0.0.1:${config("SUPPLIERS_SERVICE_PORT")}/api/v1/suppliers${
         req.url
       }`,
-    limit: "35mb",
   })
 );
 
