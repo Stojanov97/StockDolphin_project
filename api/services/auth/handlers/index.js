@@ -59,13 +59,13 @@ const registerHandler = async (req, res) => {
       id: user._id,
     };
     console.log(payload);
-    const token = await jwt.sign(payload, secret, { expiresIn: "30min" });
+    const token = await jwt.sign(payload, secret, { expiresIn: "30s" });
     const refreshToken = await jwt.sign(payload, refreshSecret, {
       expiresIn: "24h",
     });
     sendMail(email, "Welcome To Our Platform", welcomeTemplate(username));
     await res.cookie("token", token, {
-      expires: new Date(Date.now() + 1800000),
+      expires: new Date(Date.now() + 30000),
       httpOnly: false,
     });
     return await res
@@ -73,7 +73,7 @@ const registerHandler = async (req, res) => {
         expires: new Date(Date.now() + 86400000),
         httpOnly: true,
       })
-      .json({ logged: true });
+      .json({ success: true });
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -102,12 +102,12 @@ const loginHandler = async (req, res) => {
       admin: user.admin,
       id: user._id,
     };
-    const token = await jwt.sign(payload, secret, { expiresIn: "30min" });
+    const token = await jwt.sign(payload, secret, { expiresIn: "30s" });
     const refreshToken = await jwt.sign(payload, refreshSecret, {
       expiresIn: "24h",
     });
     await res.cookie("token", token, {
-      expires: new Date(Date.now() + 1800000),
+      expires: new Date(Date.now() + 30000),
       httpOnly: false,
     });
     return await res
@@ -115,7 +115,7 @@ const loginHandler = async (req, res) => {
         expires: new Date(Date.now() + 86400000),
         httpOnly: true,
       })
-      .json({ logged: true });
+      .json({ success: true });
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -228,14 +228,19 @@ const refreshToken = async (req, res) => {
         config("REFRESH_JWT_SECRET")
       );
       let token = jwt.sign(payload, config("JWT_SECRET"), {
-        expiresIn: "30min",
+        expiresIn: "30s",
       });
-      req.refreshAccessToken = token;
       await res.cookie("token", token, {
-        expires: new Date(Date.now() + 1800000),
+        expires: new Date(Date.now() + 30000),
         httpOnly: false,
       });
-      return res.status(200).json({ success: true, msg: "Token refreshed" });
+      return res
+        .status(200)
+        .json({ success: true, msg: "Token refreshed", token: token });
+    } else if (!req.cookies.refreshToken) {
+      return res
+        .status(404)
+        .json({ success: false, msg: "No refreshToken found" });
     }
   } catch (err) {
     return res

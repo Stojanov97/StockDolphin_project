@@ -15,6 +15,7 @@ const Register = ({ toggleHasAccount }) => {
           <div className="form-divide">
             <label htmlFor="name">Name</label>
             <input
+              required
               type="text"
               name="name"
               placeholder="name"
@@ -24,6 +25,7 @@ const Register = ({ toggleHasAccount }) => {
             />
             <label htmlFor="lastname">Lastname</label>
             <input
+              required
               type="text"
               name="lastname"
               placeholder="lastname"
@@ -33,6 +35,7 @@ const Register = ({ toggleHasAccount }) => {
             />
             <label htmlFor="username">Username</label>
             <input
+              required
               type="text"
               name="username"
               placeholder="username"
@@ -44,6 +47,7 @@ const Register = ({ toggleHasAccount }) => {
           <div className="form-divide">
             <label htmlFor="email">Email</label>
             <input
+              required
               type="email"
               name="email"
               placeholder="email"
@@ -53,6 +57,7 @@ const Register = ({ toggleHasAccount }) => {
             />
             <label htmlFor="password">Password</label>
             <input
+              required
               type="password"
               name="password"
               placeholder="password"
@@ -71,12 +76,12 @@ const Register = ({ toggleHasAccount }) => {
             />
           </div>
         </form>
+        <p className="missing-err">{err && err}</p>
         <button
           className="submit-btn"
           onClick={async (e) => {
             try {
-              e.preventDefault();
-              let status = await fetch(
+              let rawStatus = await fetch(
                 "http://localhost:3000/api/v1/auth/register",
                 {
                   method: "POST",
@@ -90,19 +95,22 @@ const Register = ({ toggleHasAccount }) => {
                     admin: admin,
                   }),
                 }
-              ).then((data) => console.log("data", data));
-              console.log(status.body);
+              );
+              let status = await rawStatus.json();
+              console.log(status.err);
               if (status.success === false) {
                 setErr(status.err);
+              } else if (status.success === true) {
+                setErr(false);
               }
             } catch (err) {
               console.log("Err", err);
+              setErr(err);
             }
           }}
         >
           Register
         </button>
-        {err && <p>{err}</p>}
         <a className="accountStat" onClick={toggleHasAccount}>
           I have an account
         </a>
