@@ -45,10 +45,12 @@ const registerHandler = async (req, res) => {
         code: 409,
         error: "The password must be at least 8 characters long",
       };
+    console.log("made it past tests");
     req.body.password = await bcrypt.hash(
       req.body.password,
       parseInt(config("HASHING_SALT"))
     );
+    console.log(req.body);
     const user = await create(req.body);
     const payload = {
       username: username,
@@ -56,6 +58,7 @@ const registerHandler = async (req, res) => {
       admin: user.admin,
       id: user._id,
     };
+    console.log(payload);
     const token = await jwt.sign(payload, secret, { expiresIn: "30min" });
     const refreshToken = await jwt.sign(payload, refreshSecret, {
       expiresIn: "24h",
@@ -63,7 +66,7 @@ const registerHandler = async (req, res) => {
     sendMail(email, "Welcome To Our Platform", welcomeTemplate(username));
     await res.cookie("token", token, {
       expires: new Date(Date.now() + 1800000),
-      httpOnly: true,
+      httpOnly: false,
     });
     return await res
       .cookie("refreshToken", refreshToken, {
@@ -105,7 +108,7 @@ const loginHandler = async (req, res) => {
     });
     await res.cookie("token", token, {
       expires: new Date(Date.now() + 1800000),
-      httpOnly: true,
+      httpOnly: false,
     });
     return await res
       .cookie("refreshToken", refreshToken, {
@@ -230,7 +233,7 @@ const refreshToken = async (req, res) => {
       req.refreshAccessToken = token;
       await res.cookie("token", token, {
         expires: new Date(Date.now() + 1800000),
-        httpOnly: true,
+        httpOnly: false,
       });
       return res.status(200).json({ success: true, msg: "Token refreshed" });
     }

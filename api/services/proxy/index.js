@@ -1,3 +1,4 @@
+const path = require("path");
 const proxy = require("express-http-proxy");
 const express = require("express");
 const config = require("../../pkg/config").get;
@@ -51,6 +52,8 @@ app.use(
       }`,
   })
 );
+
+app.use("/", express.static(path.join(__dirname, "../../../web/build")));
 
 const PORT = config("APP_PORT") || 3000;
 
