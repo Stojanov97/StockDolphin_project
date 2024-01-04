@@ -71,7 +71,7 @@ const registerHandler = async (req, res) => {
     return await res
       .cookie("refreshToken", refreshToken, {
         expires: new Date(Date.now() + 86400000),
-        httpOnly: true,
+        httpOnly: false,
       })
       .json({ success: true });
   } catch (err) {
@@ -113,7 +113,7 @@ const loginHandler = async (req, res) => {
     return await res
       .cookie("refreshToken", refreshToken, {
         expires: new Date(Date.now() + 86400000),
-        httpOnly: true,
+        httpOnly: false,
       })
       .json({ success: true });
   } catch (err) {
@@ -240,12 +240,20 @@ const refreshToken = async (req, res) => {
     } else if (!req.cookies.refreshToken) {
       return res
         .status(404)
-        .json({ success: false, msg: "No refreshToken found" });
+        .json({ success: false, msg: "No refreshToken found", token: false });
+    } else if (req.cookies.token) {
+      return res.status(200).json({
+        success: true,
+        msg: "already had a token",
+        token: req.cookies.token,
+      });
     }
   } catch (err) {
-    return res
-      .status(err.code || 500)
-      .json({ success: false, err: err || "Internal server error" });
+    return res.status(err.code || 500).json({
+      success: false,
+      err: err || "Internal server error",
+      token: false,
+    });
   }
 };
 
