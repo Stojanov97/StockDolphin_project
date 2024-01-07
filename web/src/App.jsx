@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import "./App.css";
-import SignInPage from "./Components/SignInPage";
+import "./Styles/App.css";
+import SignInPage from "./Pages/SignInPage";
+import MainLayout from "./Components/MainLayout";
+import Dashboard from "./Components/Dashboard";
 
 function App() {
   const [logged, setLogged] = useState(false);
@@ -38,9 +40,18 @@ function App() {
 
   return (
     <div className="App">
-      {logged ? <p>hi</p> : <SignInPage />}
+      {logged ? (
+        <MainLayout>
+          <Dashboard />
+        </MainLayout>
+      ) : (
+        <SignInPage />
+      )}
+      {/* <br />
+      <br />
+      <br />
       <p>{logged.toString()}</p>
-      <p>token: {token.toString()}</p>
+      <p>token: {token.toString()}</p> */}
     </div>
   );
 }

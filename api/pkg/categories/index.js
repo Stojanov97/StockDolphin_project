@@ -4,8 +4,11 @@ const CategoryScheme = new mongoose.Schema(
   {
     name: { type: String, required: true },
     By: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "User",
+      name: { type: String, required: true },
+      id: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "User",
+      },
     },
   },
   { timestamps: true }
@@ -32,7 +35,7 @@ const read = async () => {
 
 const readByUserID = async (id) => {
   try {
-    return await category.find({ By: id });
+    return await category.find({ By: { id: id } });
   } catch (err) {
     throw new Error(err);
   }

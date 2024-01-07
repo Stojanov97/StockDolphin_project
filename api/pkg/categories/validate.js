@@ -1,11 +1,11 @@
 const CategoryCreate = {
   name: "required|string",
-  By: "required|string",
+  By: "required|object",
 };
 
 const CategoryUpdate = {
   name: "string",
-  By: "string",
+  // By: "object",
 };
 
 module.exports = {

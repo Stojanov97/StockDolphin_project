@@ -6,7 +6,9 @@ const {
   readHandler,
   readByUserHandler,
   updateHandler,
+  moveHandler,
   deleteHandler,
+  readActivityHandler,
 } = require("./handlers");
 
 const cookieParser = require("cookie-parser");
@@ -26,14 +28,16 @@ service.use(
       return req.cookies.token;
     },
   }).unless({
-    path: [{ url: "/api/v1/items/", method: "GET" }],
+    path: ["/api/v1/items/recent", { url: "/api/v1/items/", method: "GET" }],
   })
 );
 
 service.get("/api/v1/items", readHandler);
 service.get("/api/v1/items/user", readByUserHandler);
+service.get("/api/v1/items/recent", readActivityHandler);
 service.post("/api/v1/items", createHandler);
 service.patch("/api/v1/items/:id", updateHandler);
+service.patch("/api/v1/items/move/:id", moveHandler);
 service.delete("/api/v1/items/:id", deleteHandler);
 
 service.listen(port, (err) =>

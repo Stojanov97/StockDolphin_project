@@ -4,12 +4,21 @@ const ItemScheme = new mongoose.Schema(
   {
     name: { type: String, required: true },
     category: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "category",
+      id: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "User",
+      },
+      name: {
+        type: String,
+        required: true,
+      },
     },
     By: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "User",
+      name: { type: String, required: true },
+      id: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "category",
+      },
     },
   },
   { timestamps: true }
@@ -34,9 +43,17 @@ const read = async () => {
   }
 };
 
+const readByID = async (id) => {
+  try {
+    return await item.findOne({ _id: id });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 const readByUserID = async (id) => {
   try {
-    return await item.find({ By: id });
+    return await item.find({ By: { id: id } });
   } catch (err) {
     throw new Error(err);
   }
@@ -61,6 +78,7 @@ const remove = async (id) => {
 module.exports = {
   create,
   read,
+  readByID,
   readByUserID,
   update,
   remove,

@@ -31,7 +31,7 @@ service.use(
       "/api/v1/auth/register",
       "/api/v1/auth/login",
       "/api/v1/auth/refreshToken",
-      { url: "/api/v1/auth/", methods: ["GET", "POST"] },
+      { url: "/api/v1/auth/", methods: ["GET", "POST", "DELETE"] },
       { url: /^\/api\/v1\/auth\/.*/, method: "PATCH" },
     ],
   })

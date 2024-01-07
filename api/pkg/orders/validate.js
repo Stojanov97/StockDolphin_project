@@ -1,20 +1,18 @@
 const OrderCreate = {
-  supplier: "required|string",
-  supplierId: "required|string",
+  supplier: "required|object",
   price: "required|decimal",
   quantity: "required|decimal",
-  item: "required|string",
+  item: "required|object",
   date: "required|date",
-  By: "required|string",
+  By: "required|object",
 };
 
 const OrderUpdate = {
-  supplier: "string",
-  supplierId: "string",
+  supplier: "object",
   price: "decimal",
   quantity: "decimal",
   date: "date",
-  By: "string",
+  By: "object",
 };
 
 module.exports = {

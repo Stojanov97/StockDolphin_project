@@ -2,21 +2,29 @@ const mongoose = require("mongoose");
 
 const OrderScheme = new mongoose.Schema(
   {
-    supplier: { type: String, required: true },
-    supplierId: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "supplier",
+    supplier: {
+      name: { type: String, required: true },
+      id: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "supplier",
+      },
     },
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
     date: { type: Date, required: true },
     item: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "item",
+      name: { type: String, required: true },
+      id: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "item",
+      },
     },
     By: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "User",
+      name: { type: String, required: true },
+      id: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "User",
+      },
     },
   },
   { timestamps: true }
@@ -43,7 +51,7 @@ const read = async () => {
 
 const readByItemID = async (id) => {
   try {
-    return await order.find({ item: id });
+    return await order.find({ item: { id: id } });
   } catch (err) {
     throw new Error(err);
   }
@@ -57,9 +65,20 @@ const update = async (id, data) => {
   }
 };
 
+const readRecent = async () => {
+  try {
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    return await order.find({ updatedAt: { $lt: threeDaysAgo } });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   create,
   read,
   readByItemID,
   update,
+  readRecent,
 };

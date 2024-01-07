@@ -13,10 +13,9 @@ const { validate } = require("../../../pkg/validator");
 
 const createHandler = async (req, res) => {
   try {
-    let userID = req.auth.id;
-    if (req.auth.admin === false)
-      throw { code: 401, error: "You aren't an admin" };
-    let data = { ...req.body, ...{ By: userID } };
+    const { admin, id, username } = req.auth;
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
+    let data = { ...req.body, ...{ By: { id: id, name: username } } };
     await validate(data, SupplierCreate);
     await create(data);
     return await res.json({ success: true });
@@ -39,11 +38,12 @@ const readHandler = async (req, res) => {
 
 const updateHandler = async (req, res) => {
   try {
-    if (req.auth.admin === false)
-      throw { code: 401, error: "You aren't an admin" };
+    const { admin, id: userID, username } = req.auth;
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
-    await validate(req.body, SupplierUpdate);
-    await update(id, req.body);
+    let data = { ...req.body, ...{ By: { id: userID, name: username } } };
+    await validate(data, SupplierUpdate);
+    await update(id, data);
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -54,9 +54,10 @@ const updateHandler = async (req, res) => {
 
 const deleteHandler = async (req, res) => {
   try {
-    if (req.auth.admin === false)
-      throw { code: 401, error: "You aren't an admin" };
-    await remove(req.params.id);
+    const { admin } = req.auth;
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
+    const { id } = req.params;
+    await remove(id);
     return await res.json({ success: true });
   } catch (err) {
     return res

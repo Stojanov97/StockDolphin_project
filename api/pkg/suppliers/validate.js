@@ -3,7 +3,7 @@ const SupplierCreate = {
   address: "required|string",
   phone: "required|decimal",
   email: "required|string",
-  By: "required|string",
+  By: "required|object",
 };
 
 const SupplierUpdate = {
@@ -11,7 +11,7 @@ const SupplierUpdate = {
   address: "string",
   phone: "decimal",
   email: "string",
-  By: "string",
+  By: "object",
 };
 module.exports = {
   SupplierCreate,

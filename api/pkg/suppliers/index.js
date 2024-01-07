@@ -7,8 +7,11 @@ const SupplierScheme = new mongoose.Schema(
     phone: { type: Number, required: true },
     email: { type: String, required: true, lowercase: true },
     By: {
-      type: mongoose.SchemaTypes.ObjectId,
-      ref: "User",
+      name: { type: String, required: true },
+      id: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "User",
+      },
     },
   },
   { timestamps: true }

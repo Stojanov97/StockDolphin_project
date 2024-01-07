@@ -6,6 +6,7 @@ const {
   readHandler,
   readByItemHandler,
   updateHandler,
+  recentOrdersHandler,
 } = require("./handlers");
 
 const cookieParser = require("cookie-parser");
@@ -31,6 +32,7 @@ service.use(
 );
 
 service.get("/api/v1/orders", readHandler);
+service.get("/api/v1/orders/recent", recentOrdersHandler);
 service.get("/api/v1/orders/:item", readByItemHandler);
 service.post("/api/v1/orders", createHandler);
 service.patch("/api/v1/orders/:id", updateHandler);

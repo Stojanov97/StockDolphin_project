@@ -1,18 +1,39 @@
-const { create, read, readByItemID, update } = require("../../../pkg/orders");
+const {
+  create,
+  read,
+  readByItemID,
+  update,
+  readRecent,
+} = require("../../../pkg/orders");
+const activity = require("../../../pkg/itemActivity");
+const { readByID: itemByID } = require("../../../pkg/items");
 const { OrderCreate, OrderUpdate } = require("../../../pkg/orders/validate");
 const { validate } = require("../../../pkg/validator");
 
 const createHandler = async (req, res) => {
   try {
-    let userID = req.auth.id;
-    if (req.auth.admin === false)
-      throw { code: 401, error: "You aren't an admin" };
+    const { admin, username, id } = req.auth;
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
     let data = {
-      ...req.body,
-      ...{ By: userID },
+      supplier: {
+        name: req.body.supplierName,
+        id: req.body.supplier,
+      },
+      quantity: req.body.quantity,
+      price: req.body.price,
+      date: req.body.date,
+      item: { name: req.body.itemName, id: req.body.item },
+      By: { name: username, id: id },
     };
     await validate(data, OrderCreate);
+    let item = await itemByID(req.body.item);
     await create(data);
+    await activity.create({
+      By: { name: username, id: id },
+      action: "ordered", //za testiranje
+      item: { name: req.body.itemName, id: req.body.item },
+      in: item.category,
+    });
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -43,12 +64,23 @@ const readByItemHandler = async (req, res) => {
 
 const updateHandler = async (req, res) => {
   try {
-    if (req.auth.admin === false)
-      throw { code: 401, error: "You aren't an admin" };
+    const { admin, username } = req.auth;
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
-    if (req.body.item) throw { code: 400, error: "You can't change the item" };
-    await validate(req.body, OrderUpdate);
-    await update(id, req.body);
+    if (req.body.item || req.body.itemName)
+      throw { code: 400, error: "You can't change the item" };
+    let data = {
+      supplier: {
+        name: req.body.supplierName,
+        id: req.body.supplier,
+      },
+      quantity: req.body.quantity,
+      price: req.body.price,
+      date: req.body.date,
+      By: { name: username, id: id },
+    };
+    await validate(data, OrderUpdate);
+    await update(id, data);
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -57,9 +89,18 @@ const updateHandler = async (req, res) => {
   }
 };
 
+const recentOrdersHandler = async () => {
+  try {
+    return await res.json(await readRecent());
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   createHandler,
   readHandler,
   readByItemHandler,
   updateHandler,
+  recentOrdersHandler,
 };

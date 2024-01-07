@@ -26,6 +26,11 @@ const {
   sendMail,
 } = require("../../../pkg/mailer");
 
+const TOKEN_EXPIRE_SECONDS = 1800000;
+const TOKEN_EXPIRE_TIME = "30min";
+const REFRESH_TOKEN_EXPIRE_SECONDS = 86400000;
+const REFRESH_TOKEN_EXPIRE_TIME = "24h";
+
 const registerHandler = async (req, res) => {
   try {
     await validate(req.body, UserRegister);
@@ -52,6 +57,7 @@ const registerHandler = async (req, res) => {
     );
     console.log(req.body);
     const user = await create(req.body);
+    console.log("between payload");
     const payload = {
       username: username,
       email: email,
@@ -59,19 +65,21 @@ const registerHandler = async (req, res) => {
       id: user._id,
     };
     console.log(payload);
-    const token = await jwt.sign(payload, secret, { expiresIn: "30s" });
+    const token = await jwt.sign(payload, secret, {
+      expiresIn: TOKEN_EXPIRE_TIME,
+    });
     const refreshToken = await jwt.sign(payload, refreshSecret, {
-      expiresIn: "24h",
+      expiresIn: REFRESH_TOKEN_EXPIRE_TIME,
     });
     sendMail(email, "Welcome To Our Platform", welcomeTemplate(username));
     await res.cookie("token", token, {
-      expires: new Date(Date.now() + 30000),
+      expires: new Date(Date.now() + TOKEN_EXPIRE_SECONDS),
       httpOnly: false,
     });
     return await res
       .cookie("refreshToken", refreshToken, {
-        expires: new Date(Date.now() + 86400000),
-        httpOnly: false,
+        expires: new Date(Date.now() + REFRESH_TOKEN_EXPIRE_SECONDS),
+        httpOnly: true,
       })
       .json({ success: true });
   } catch (err) {
@@ -102,18 +110,20 @@ const loginHandler = async (req, res) => {
       admin: user.admin,
       id: user._id,
     };
-    const token = await jwt.sign(payload, secret, { expiresIn: "30s" });
+    const token = await jwt.sign(payload, secret, {
+      expiresIn: TOKEN_EXPIRE_TIME,
+    });
     const refreshToken = await jwt.sign(payload, refreshSecret, {
-      expiresIn: "24h",
+      expiresIn: REFRESH_TOKEN_EXPIRE_TIME,
     });
     await res.cookie("token", token, {
-      expires: new Date(Date.now() + 30000),
+      expires: new Date(Date.now() + TOKEN_EXPIRE_SECONDS),
       httpOnly: false,
     });
     return await res
       .cookie("refreshToken", refreshToken, {
-        expires: new Date(Date.now() + 86400000),
-        httpOnly: false,
+        expires: new Date(Date.now() + REFRESH_TOKEN_EXPIRE_SECONDS),
+        httpOnly: true,
       })
       .json({ success: true });
   } catch (err) {
@@ -125,9 +135,9 @@ const loginHandler = async (req, res) => {
 
 const updateCredentialsHandler = async (req, res) => {
   try {
-    const token = req.auth;
+    const { id } = req.auth;
     if (req.body.password || req.body.admin) return res.send("unavailable");
-    await update(token.id, req.body);
+    await update(id, req.body);
     return res.status(200).json({ success: true });
   } catch (err) {
     return res
@@ -228,10 +238,10 @@ const refreshToken = async (req, res) => {
         config("REFRESH_JWT_SECRET")
       );
       let token = jwt.sign(payload, config("JWT_SECRET"), {
-        expiresIn: "30s",
+        expiresIn: TOKEN_EXPIRE_TIME,
       });
       await res.cookie("token", token, {
-        expires: new Date(Date.now() + 30000),
+        expires: new Date(Date.now() + TOKEN_EXPIRE_SECONDS),
         httpOnly: false,
       });
       return res

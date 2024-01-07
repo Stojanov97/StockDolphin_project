@@ -1,11 +1,17 @@
 const {
   create,
   read,
+  readByID,
   readByUserID,
   update,
   remove,
 } = require("../../../pkg/items");
-const { ItemCreate, ItemUpdate } = require("../../../pkg/items/validate");
+const activity = require("../../../pkg/itemActivity");
+const {
+  ItemCreate,
+  ItemUpdate,
+  ItemMove,
+} = require("../../../pkg/items/validate");
 const { validate } = require("../../../pkg/validator");
 const {
   upload,
@@ -16,16 +22,22 @@ const {
 
 const createHandler = async (req, res) => {
   try {
-    let userID = req.auth.id;
-    if (req.auth.admin === false)
-      throw { code: 401, error: "You aren't an admin" };
+    const { admin, username, id } = req.auth;
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
     let data = {
-      ...req.body,
-      ...{ By: userID },
+      name: req.body.name,
+      category: { id: req.body.category, name: req.body.categoryName },
+      By: { id: id, name: username },
     };
     await validate(data, ItemCreate);
     let item = await create(data);
     req.files && upload(req.files.photo, "item", item._id);
+    await activity.create({
+      By: { name: username, id: id },
+      action: "created",
+      item: { id: item._id, name: item.name },
+      in: { id: req.body.category, name: req.body.categoryName },
+    });
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -56,8 +68,8 @@ const readHandler = async (req, res) => {
 
 const readByUserHandler = async (req, res) => {
   try {
-    let userID = req.auth.id;
-    let items = await readByUserID(userID);
+    const { id } = req.auth;
+    let items = await readByUserID(id);
     let photos = await downloadAll("item");
     items = items.map((item) => {
       return {
@@ -77,12 +89,24 @@ const readByUserHandler = async (req, res) => {
 
 const updateHandler = async (req, res) => {
   try {
-    if (req.auth.admin === false)
-      throw { code: 401, error: "You aren't an admin" };
+    const { admin, username, id: userID } = req.auth;
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
-    await validate(req.body, ItemUpdate);
-    await update(id, req.body);
+    let data = {
+      name: req.body.name,
+      By: { id: userID, name: username },
+    };
+    await validate(data, ItemUpdate);
+    let item = await readByID(id);
+    console.log(item);
+    await update(id, data);
     req.files && updateFile(req.files.photo, "item", id);
+    await activity.create({
+      By: { name: username, id: userID },
+      action: "edited",
+      item: { id: item._id, name: item.name },
+      in: item.category,
+    });
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -91,14 +115,66 @@ const updateHandler = async (req, res) => {
   }
 };
 
+const moveHandler = async (req, res) => {
+  try {
+    const { admin, username, id: userID } = req.auth;
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
+    const { id } = req.params;
+    let data = {
+      category: { id: req.body.category, name: req.body.categoryName },
+      By: { id: userID, name: username },
+    };
+    await validate(data, ItemMove);
+    await update(id, data);
+    let item = await readByID(id); //
+    console.log(item);
+    await activity.create({
+      By: { name: username, id: userID },
+      action: "moved",
+      item: { id: id, name: item.name },
+      in: item.category,
+    });
+    ////
+    // await activity.create({
+    //   By: { name: username, id: userID },
+    //   action: "created",
+    //   item: { id: item._id, name: item.name },
+    //   in: { id: req.body.category, name: req.body.categoryName },
+    // });
+    return await res.json({ success: true });
+  } catch (err) {
+    return res
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
+  }
+};
 const deleteHandler = async (req, res) => {
   try {
-    if (req.auth.admin === false)
-      throw { code: 401, error: "You aren't an admin" };
+    const { admin, username, id: userID } = req.auth;
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
+    let item = await readByID(id);
     await remove(id);
     await removeFile("item", id);
+    await activity.create({
+      By: { name: username, id: userID },
+      action: "deleted",
+      item: { id: item._id, name: item.name },
+      in: item.category,
+    });
     return await res.json({ success: true });
+  } catch (err) {
+    return res
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
+  }
+};
+
+const readActivityHandler = async (req, res) => {
+  try {
+    await activity.deleteOld();
+    let activities = await activity.read();
+    return await res.json(activities);
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -111,5 +187,7 @@ module.exports = {
   readHandler,
   readByUserHandler,
   updateHandler,
+  moveHandler,
   deleteHandler,
+  readActivityHandler,
 };

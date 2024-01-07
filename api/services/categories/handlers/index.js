@@ -19,10 +19,12 @@ const {
 
 const createHandler = async (req, res) => {
   try {
-    let userID = req.auth.id;
-    if (req.auth.admin === false)
-      throw { code: 401, error: "You aren't an admin" };
-    let data = { ...req.body, ...{ By: userID } };
+    const { admin, username, id } = req.auth;
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
+    let data = {
+      ...req.body,
+      ...{ By: { name: username, id: id } },
+    };
     await validate(data, CategoryCreate);
     let category = await create(data);
     req.files && upload(req.files.photo, "cat", category._id);
@@ -56,8 +58,8 @@ const readHandler = async (req, res) => {
 
 const readByUserHandler = async (req, res) => {
   try {
-    let userID = req.auth.id;
-    let categories = await readByUserID(userID);
+    const { id } = req.auth;
+    let categories = await readByUserID(id);
     let photos = await downloadAll("cat");
     categories = categories.map((cat) => {
       return {
@@ -77,11 +79,16 @@ const readByUserHandler = async (req, res) => {
 
 const updateHandler = async (req, res) => {
   try {
-    if (req.auth.admin === false)
-      throw { code: 401, error: "You aren't an admin" };
+    const { admin, username, id: userID } = req.auth;
+    console.log(userID); //testiraj
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
-    await validate(req.body, CategoryUpdate);
-    await update(id, req.body);
+    let data = {
+      ...req.body,
+      ...{ By: { name: username, id: userID } },
+    };
+    await validate(data, CategoryUpdate);
+    await update(id, data);
     req.files && updateFile(req.files.photo, "cat", id);
     return await res.json({ success: true });
   } catch (err) {
@@ -93,8 +100,8 @@ const updateHandler = async (req, res) => {
 
 const deleteHandler = async (req, res) => {
   try {
-    if (req.auth.admin === false)
-      throw { code: 401, error: "You aren't an admin" };
+    const { admin } = req.auth;
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
     await remove(id);
     await removeFile("cat", id);
