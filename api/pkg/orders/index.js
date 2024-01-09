@@ -69,7 +69,7 @@ const readRecent = async () => {
   try {
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-    return await order.find({ updatedAt: { $lt: threeDaysAgo } });
+    return await order.find({ updatedAt: { $gt: threeDaysAgo } });
   } catch (err) {
     throw new Error(err);
   }

@@ -15,6 +15,7 @@ const {
   downloadAll,
   updateFile,
   removeFile,
+  downloadByID,
 } = require("../../../pkg/files");
 
 const createHandler = async (req, res) => {
@@ -113,10 +114,28 @@ const deleteHandler = async (req, res) => {
   }
 };
 
+const getImage = async (req, res) => {
+  try {
+    const path = await downloadByID("cat", req.params.id);
+    return await res.sendFile(path, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Sent");
+      }
+    });
+  } catch (err) {
+    return res
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
+  }
+};
+
 module.exports = {
   createHandler,
   readHandler,
   readByUserHandler,
   updateHandler,
   deleteHandler,
+  getImage,
 };

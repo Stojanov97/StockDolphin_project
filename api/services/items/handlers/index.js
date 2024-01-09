@@ -18,6 +18,7 @@ const {
   downloadAll,
   updateFile,
   removeFile,
+  downloadByID,
 } = require("../../../pkg/files");
 
 const createHandler = async (req, res) => {
@@ -98,7 +99,6 @@ const updateHandler = async (req, res) => {
     };
     await validate(data, ItemUpdate);
     let item = await readByID(id);
-    console.log(item);
     await update(id, data);
     req.files && updateFile(req.files.photo, "item", id);
     await activity.create({
@@ -127,7 +127,6 @@ const moveHandler = async (req, res) => {
     await validate(data, ItemMove);
     await update(id, data);
     let item = await readByID(id); //
-    console.log(item);
     await activity.create({
       By: { name: username, id: userID },
       action: "moved",
@@ -182,6 +181,23 @@ const readActivityHandler = async (req, res) => {
   }
 };
 
+const getImage = async (req, res) => {
+  try {
+    const path = await downloadByID("item", req.params.id);
+    return await res.sendFile(path, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Sent");
+      }
+    });
+  } catch (err) {
+    return res
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
+  }
+};
+
 module.exports = {
   createHandler,
   readHandler,
@@ -190,4 +206,5 @@ module.exports = {
   moveHandler,
   deleteHandler,
   readActivityHandler,
+  getImage,
 };

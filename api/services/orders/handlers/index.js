@@ -8,6 +8,7 @@ const {
 const activity = require("../../../pkg/itemActivity");
 const { readByID: itemByID } = require("../../../pkg/items");
 const { OrderCreate, OrderUpdate } = require("../../../pkg/orders/validate");
+const { downloadAll } = require("../../../pkg/files");
 const { validate } = require("../../../pkg/validator");
 
 const createHandler = async (req, res) => {
@@ -89,9 +90,10 @@ const updateHandler = async (req, res) => {
   }
 };
 
-const recentOrdersHandler = async () => {
+const recentOrdersHandler = async (req, res) => {
   try {
-    return await res.json(await readRecent());
+    let orders = await readRecent();
+    return await res.json(orders);
   } catch (err) {
     throw new Error(err);
   }

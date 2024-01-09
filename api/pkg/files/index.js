@@ -49,6 +49,28 @@ const downloadAll = async (type) => {
   }
 };
 
+const downloadByID = async (type, id) => {
+  try {
+    const destination = `${__dirname}/../../uploads/${type}/${id}`;
+    let files = await fs.promises.readdir(destination, { recursive: true });
+    files = files
+      .filter(
+        (value) => path.parse(value).base !== path.parse(value).name && value
+      )
+      .map((value) => {
+        return path.normalize(`${destination}/${value}`);
+      });
+    console.log(files[0]);
+    return files[0];
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      return [];
+    } else {
+      throw { error: err };
+    }
+  }
+};
+
 const upload = (file, type, id) => {
   if (MAX_FILESIZE < file.size)
     throw {
@@ -151,4 +173,5 @@ module.exports = {
   downloadAll,
   updateFile,
   removeFile,
+  downloadByID,
 };

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import "./Styles/App.css";
+import "./Styles/light.css";
+// import "./Styles/dark.css";
 import SignInPage from "./Pages/SignInPage";
-import MainLayout from "./Components/MainLayout";
+import MainLayout from "./Pages/MainLayout";
 import Dashboard from "./Components/Dashboard";
 
 function App() {
@@ -40,7 +42,7 @@ function App() {
 
   return (
     <div className="App">
-      {logged ? (
+      {!logged ? (
         <MainLayout>
           <Dashboard />
         </MainLayout>

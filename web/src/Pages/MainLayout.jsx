@@ -4,7 +4,7 @@ import dashboard from "../Images/Dashboard.png";
 import inventory from "../Images/Inventory.png";
 import reports from "../Images/Reports.png";
 import signOut from "../Images/LogOut.png";
-import "../Styles/mainLayout.css";
+import "./styles/mainLayout.css";
 
 const MainLayout = (props) => {
   return (
@@ -13,15 +13,15 @@ const MainLayout = (props) => {
         <div className="links">
           <img src={logo} alt="ITL logo" className="logo btn" />
           <button className="nav-btn">
-            <img src={dashboard} />
+            <img src={dashboard} alt="" />
             Dashboard
           </button>
           <button className="nav-btn">
-            <img src={inventory} />
+            <img src={inventory} alt="" />
             Inventory
           </button>
           <button className="nav-btn">
-            <img src={reports} />
+            <img src={reports} alt="" />
             Reports
           </button>
           <button className="nav-btn" id="supplier-btn">
@@ -29,7 +29,7 @@ const MainLayout = (props) => {
           </button>
         </div>
         <button className="nav-btn">
-          <img src={signOut} />
+          <img src={signOut} alt="" />
           Sign Out
         </button>
       </nav>

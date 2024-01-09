@@ -54,7 +54,6 @@ const create = async (data) => {
 
 const read = async () => {
   try {
-    console.log(await itemActivity.find());
     return await itemActivity.find();
   } catch (err) {
     throw new Error(err);
