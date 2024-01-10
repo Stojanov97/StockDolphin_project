@@ -159,7 +159,7 @@ const requestResetPasswordHandler = async (req, res) => {
       "Password Reset Email",
       resetTemplate(user.username, user._id)
     );
-    return res.status(200).json({ sent: true });
+    return res.status(200).json({ success: true });
   } catch (err) {
     return res
       .status(err.code || 500)

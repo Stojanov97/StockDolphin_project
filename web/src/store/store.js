@@ -1,16 +1,19 @@
-import { createStore } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import ThemeReducer from "../Slices/ThemeSlice";
+import rootReducer from "./reducerCombiner";
 
 const persistConfig = {
-  key: "theme",
+  key: "root",
   storage,
+  whitelist: ["theme"],
 };
 
-const persistedReducer = persistReducer(persistConfig, ThemeReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const store = createStore(persistedReducer);
+const store = configureStore({
+  reducer: persistedReducer,
+});
 const persistor = persistStore(store);
 
 export { store, persistor };

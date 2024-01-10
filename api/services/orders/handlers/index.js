@@ -109,6 +109,20 @@ const getLength = async (req, res) => {
   }
 };
 
+const getValue = async (req, res) => {
+  try {
+    const orders = await read();
+    // console.log("orders", orders);
+    const value = orders.reduce((acc, curr) => acc + curr.price, 0);
+    console.log(value);
+    return await res.json(value);
+  } catch (err) {
+    return res
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
+  }
+};
+
 module.exports = {
   createHandler,
   readHandler,
@@ -116,4 +130,5 @@ module.exports = {
   updateHandler,
   recentOrdersHandler,
   getLength,
+  getValue,
 };

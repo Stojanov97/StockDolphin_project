@@ -5,38 +5,73 @@ import inventory from "../Images/Inventory.png";
 import reports from "../Images/Reports.png";
 import signOut from "../Images/LogOut.png";
 import "./styles/mainLayout.css";
-import { MoonIcon } from "@heroicons/react/24/solid";
+import themeIcon from "../Images/theme.png";
 import { useDispatch, useSelector } from "react-redux";
 import { useThemeSwitcher } from "react-css-theme-switcher";
 import { toggle } from "../Slices/ThemeSlice";
+import { check } from "../Slices/CheckTokenSlice";
+import { useNavigate } from "react-router-dom";
 
 const MainLayout = ({ children }) => {
   const dispatch = useDispatch();
-  const selectedTheme = useSelector((state) => state.value);
+  const navigate = useNavigate();
+  const selectedTheme = useSelector((state) => state.theme.value);
 
   const { switcher, themes } = useThemeSwitcher();
   useEffect(() => {
     switcher({ theme: selectedTheme ? themes.light : themes.dark });
   }, [selectedTheme]);
-  console.log(selectedTheme);
   return (
     <main>
       <nav>
         <div className="links">
-          <img src={logo} alt="ITL logo" className="logo btn" />
-          <button className="nav-btn">
+          <img
+            src={logo}
+            alt="ITL logo"
+            className="logo btn"
+            onClick={() => {
+              dispatch(check());
+              navigate("/");
+            }}
+          />
+          <button
+            className="nav-btn"
+            onClick={() => {
+              dispatch(check());
+              navigate("/");
+            }}
+          >
             <img src={dashboard} alt="" />
             Dashboard
           </button>
-          <button className="nav-btn">
+          <button
+            className="nav-btn"
+            onClick={() => {
+              dispatch(check());
+              navigate("/inventory");
+            }}
+          >
             <img src={inventory} alt="" />
             Inventory
           </button>
-          <button className="nav-btn">
-            <img src={reports} className="test" alt="" />
+          <button
+            className="nav-btn"
+            onClick={() => {
+              dispatch(check());
+              navigate("/reports");
+            }}
+          >
+            <img src={reports} alt="" />
             Reports
           </button>
-          <button className="nav-btn" id="supplier-btn">
+          <button
+            className="nav-btn"
+            id="supplier-btn"
+            onClick={() => {
+              dispatch(check());
+              navigate("/suppliers");
+            }}
+          >
             Suppliers
           </button>
           <button
@@ -45,7 +80,8 @@ const MainLayout = ({ children }) => {
               dispatch(toggle());
             }}
           >
-            <MoonIcon className="nav-btn-icon" /> Theme
+            <img src={themeIcon} className="nav-btn-icon" />{" "}
+            {selectedTheme ? "Dark Mode" : "Light Mode"}
           </button>
         </div>
         <button
@@ -54,7 +90,8 @@ const MainLayout = ({ children }) => {
             await fetch("http://localhost:3000/api/v1/auth", {
               method: "DELETE",
             });
-            window.location.reload(false);
+            dispatch(check());
+            navigate("/");
           }}
         >
           <img src={signOut} alt="" />

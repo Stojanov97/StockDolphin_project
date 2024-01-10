@@ -15,12 +15,13 @@ import Currency from "react-currency-formatter";
 import { jwtDecode } from "jwt-decode";
 
 const Dashboard = ({ token }) => {
-  const decoded = jwtDecode(token);
+  const decoded = token === false ? false : jwtDecode(token);
   const [activities, setActivities] = useState([]);
   const [orders, setOrders] = useState([]);
   const [catNum, setCatNum] = useState(0);
   const [itemNum, setItemNum] = useState(0);
   const [orderNum, setOrderNum] = useState(0);
+  const [orderTotal, setOrderTotal] = useState(0);
   useEffect(() => {
     fetch("http://localhost:3000/api/v1/items/recent")
       .then((data) => data.json())
@@ -42,6 +43,10 @@ const Dashboard = ({ token }) => {
       .then((data) => data.json())
       .then((data) => setOrderNum(data))
       .catch((err) => console.log(err));
+    fetch("http://localhost:3000/api/v1/orders/total")
+      .then((data) => data.json())
+      .then((data) => setOrderTotal(data))
+      .catch((err) => console.log(err));
   }, []);
 
   const chunk = (array, size) => {
@@ -61,7 +66,7 @@ const Dashboard = ({ token }) => {
         <h1>Dashboard</h1>
         <div className="greeting">
           <h1>
-            Welcome {decoded.name} {decoded.lastName}
+            Welcome {decoded && decoded.name} {decoded && decoded.lastName}
           </h1>
           <img src={user} alt="" />
         </div>
@@ -97,12 +102,11 @@ const Dashboard = ({ token }) => {
               img={CoinsIcon}
               color={"#ffd5c0"}
               amount={
-                // <Currency
-                //   quantity={12501234.557}
-                //   pattern="! #,### "
-                //   currency="EUR"
-                // />
-                "invoices to add"
+                <Currency
+                  quantity={orderTotal}
+                  pattern="! #,### "
+                  currency="EUR"
+                />
               }
               title={"Total Cost"}
             />
