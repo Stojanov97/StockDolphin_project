@@ -60,6 +60,8 @@ const registerHandler = async (req, res) => {
     console.log("between payload");
     const payload = {
       username: username,
+      name: user.name,
+      lastName: user.lastName,
       email: email,
       admin: user.admin,
       id: user._id,
@@ -106,6 +108,8 @@ const loginHandler = async (req, res) => {
       };
     const payload = {
       username: user.username,
+      name: user.name,
+      lastName: user.lastName,
       email: email,
       admin: user.admin,
       id: user._id,

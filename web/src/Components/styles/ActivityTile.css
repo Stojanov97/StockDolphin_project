@@ -6,7 +6,8 @@
     padding: 6px 17px;
     height: 40px;
     box-shadow: rgba(0, 0, 0, 0.24) 7px 5px 5px;
-    z-index: 10;
+    cursor: default;
+    color: var(--primary-text);
 }
 
 .activity-tile>b{

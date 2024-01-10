@@ -32,7 +32,8 @@ button, .btn{
     height: 60px;
     border: none;
     border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(var(--secondary-text), 0.5);
+    color: var(--primary-text);
     display: flex;
     align-items: center;
     padding: 10px;
@@ -40,31 +41,15 @@ button, .btn{
     font-size: 24px;
 }
 
+
 #supplier-btn{
     padding-left: 70px;
 }
 
-section{
-    padding: 30px 70px;
-}
-
-.breadcrumb{
-    display: flex;
-    justify-content: space-between;
-    padding: 20px 0 10px 0;
-    
-}
-
-h1{
-    font-size: 38px;
-    font-weight: 400;
-}
-
-.greeting{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
+.nav-btn-icon{
+    color: rgb(var(--secondary-text));
+    padding: 2px;
+    width: 40px;
 }
 
 .hidden{

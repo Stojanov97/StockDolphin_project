@@ -7,6 +7,7 @@ const {
   readByItemHandler,
   updateHandler,
   recentOrdersHandler,
+  getLength,
 } = require("./handlers");
 
 const cookieParser = require("cookie-parser");
@@ -25,6 +26,7 @@ service.use(
     },
   }).unless({
     path: [
+      "/api/v1/orders/length",
       { url: "/api/v1/orders/", method: "GET" },
       { url: /^\/api\/v1\/orders\/.*/, method: "GET" },
     ],
@@ -33,6 +35,7 @@ service.use(
 
 service.get("/api/v1/orders", readHandler);
 service.get("/api/v1/orders/recent", recentOrdersHandler);
+service.get("/api/v1/orders/length", getLength);
 service.get("/api/v1/orders/:item", readByItemHandler);
 service.post("/api/v1/orders", createHandler);
 service.patch("/api/v1/orders/:id", updateHandler);

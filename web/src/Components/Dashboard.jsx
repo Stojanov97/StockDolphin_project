@@ -7,10 +7,20 @@ import { Carousel } from "react-responsive-carousel";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import "./styles/Dashboard.css";
 import DashboardSummaryTile from "./DashboardSummaryTile";
+import DocumentIcon from "../Images/Documents.png";
+import FolderIcon from "../Images/Folder.png";
+import ListIcon from "../Images/Paper.png";
+import CoinsIcon from "../Images/Coins.png";
+import Currency from "react-currency-formatter";
+import { jwtDecode } from "jwt-decode";
 
-const Dashboard = () => {
+const Dashboard = ({ token }) => {
+  const decoded = jwtDecode(token);
   const [activities, setActivities] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [catNum, setCatNum] = useState(0);
+  const [itemNum, setItemNum] = useState(0);
+  const [orderNum, setOrderNum] = useState(0);
   useEffect(() => {
     fetch("http://localhost:3000/api/v1/items/recent")
       .then((data) => data.json())
@@ -19,6 +29,18 @@ const Dashboard = () => {
     fetch("http://localhost:3000/api/v1/orders/recent")
       .then((data) => data.json())
       .then((data) => setOrders(data))
+      .catch((err) => console.log(err));
+    fetch("http://localhost:3000/api/v1/categories/length")
+      .then((data) => data.json())
+      .then((data) => setCatNum(data))
+      .catch((err) => console.log(err));
+    fetch("http://localhost:3000/api/v1/items/length")
+      .then((data) => data.json())
+      .then((data) => setItemNum(data))
+      .catch((err) => console.log(err));
+    fetch("http://localhost:3000/api/v1/orders/length")
+      .then((data) => data.json())
+      .then((data) => setOrderNum(data))
       .catch((err) => console.log(err));
   }, []);
 
@@ -38,7 +60,9 @@ const Dashboard = () => {
       <div className="breadcrumb">
         <h1>Dashboard</h1>
         <div className="greeting">
-          <h1>Welcome Riste Stojanov</h1>
+          <h1>
+            Welcome {decoded.name} {decoded.lastName}
+          </h1>
           <img src={user} alt="" />
         </div>
       </div>
@@ -46,12 +70,43 @@ const Dashboard = () => {
       <div id="main-workspace">
         <div id="inventorySummary">
           <h1 className="section-title">Inventory Summary</h1>
-          <DashboardSummaryTile
-            img={<ChevronLeftIcon />}
-            color={"#454545"}
-            amount={13}
-            title={"Category"}
-          />
+          <div id="summaryTileContainer">
+            <DashboardSummaryTile
+              key={"category"}
+              img={FolderIcon}
+              color={"#ffe4aa"}
+              amount={catNum}
+              title={"Categories"}
+            />
+            <DashboardSummaryTile
+              key={"items"}
+              img={DocumentIcon}
+              color={"#c8e6ee"}
+              amount={itemNum}
+              title={"Items"}
+            />
+            <DashboardSummaryTile
+              key={"order"}
+              img={ListIcon}
+              color={"#e5caff"}
+              amount={orderNum}
+              title={"Total Orders"}
+            />
+            <DashboardSummaryTile
+              key={"Cost"}
+              img={CoinsIcon}
+              color={"#ffd5c0"}
+              amount={
+                // <Currency
+                //   quantity={12501234.557}
+                //   pattern="! #,### "
+                //   currency="EUR"
+                // />
+                "invoices to add"
+              }
+              title={"Total Cost"}
+            />
+          </div>
         </div>
         <div id="recentActivity">
           <h1 className="section-title">Recent Activity</h1>
@@ -70,6 +125,7 @@ const Dashboard = () => {
         <div id="recentOrders">
           <h1 className="section-title">Recent Orders</h1>
           <Carousel
+            showThumbs={false}
             showStatus={false}
             renderArrowPrev={(clickHandler, hasPrev) => {
               return (

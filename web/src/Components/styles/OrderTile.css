@@ -7,6 +7,8 @@
     overflow: hidden;
     background-color: var(--third-color);
     box-shadow: rgba(0, 0, 0, 0.24) 7px 5px 5px;
+    color: var(--primary-text);
+    cursor: pointer;
 }
 
 .small-img{
@@ -40,7 +42,7 @@
 }
 
 .vl{
-    border-right: 1px solid black;
+    border-right: 1px solid var(--primary-text);
 }
 
 .price{

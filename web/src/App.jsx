@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react";
 import "./Styles/App.css";
-import "./Styles/light.css";
-// import "./Styles/dark.css";
 import SignInPage from "./Pages/SignInPage";
 import MainLayout from "./Pages/MainLayout";
 import Dashboard from "./Components/Dashboard";
+import { ThemeSwitcherProvider } from "react-css-theme-switcher";
+import { useSelector } from "react-redux";
+
+const themes = {
+  light: "./light.css",
+  dark: "./dark.css",
+};
 
 function App() {
   const [logged, setLogged] = useState(false);
   const [token, setToken] = useState(false);
-
+  console.log(useSelector((state) => state));
   useEffect(() => {
     (async () => {
       const cookieString = document.cookie;
@@ -41,20 +46,20 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      {!logged ? (
-        <MainLayout>
-          <Dashboard />
-        </MainLayout>
-      ) : (
-        <SignInPage />
-      )}
-      {/* <br />
-      <br />
-      <br />
-      <p>{logged.toString()}</p>
-      <p>token: {token.toString()}</p> */}
-    </div>
+    <ThemeSwitcherProvider
+      defaultTheme={useSelector((state) => (state.value ? "light" : "dark"))}
+      themeMap={themes}
+    >
+      <div className="App">
+        {logged ? (
+          <MainLayout>
+            <Dashboard token={token} />
+          </MainLayout>
+        ) : (
+          <SignInPage />
+        )}
+      </div>
+    </ThemeSwitcherProvider>
   );
 }
 

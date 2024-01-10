@@ -198,6 +198,16 @@ const getImage = async (req, res) => {
   }
 };
 
+const getLength = async (req, res) => {
+  try {
+    return res.json((await read()).length);
+  } catch (err) {
+    return res
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
+  }
+};
+
 module.exports = {
   createHandler,
   readHandler,
@@ -207,4 +217,5 @@ module.exports = {
   deleteHandler,
   readActivityHandler,
   getImage,
+  getLength,
 };

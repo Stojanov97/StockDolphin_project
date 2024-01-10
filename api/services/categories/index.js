@@ -8,6 +8,7 @@ const {
   updateHandler,
   deleteHandler,
   getImage,
+  getLength,
 } = require("./handlers");
 
 const cookieParser = require("cookie-parser");
@@ -28,6 +29,7 @@ service.use(
     },
   }).unless({
     path: [
+      "/api/v1/categories/length",
       /^\/api\/v1\/categories\/image\/.*/,
       { url: "/api/v1/categories/", method: "GET" },
     ],
@@ -36,6 +38,7 @@ service.use(
 
 service.get("/api/v1/categories", readHandler);
 service.get("/api/v1/categories/user", readByUserHandler);
+service.get("/api/v1/categories/length", getLength);
 service.get("/api/v1/categories/image/:id", getImage);
 service.post("/api/v1/categories", createHandler);
 service.patch("/api/v1/categories/:id", updateHandler);

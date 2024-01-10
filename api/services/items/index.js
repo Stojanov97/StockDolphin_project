@@ -10,6 +10,7 @@ const {
   deleteHandler,
   readActivityHandler,
   getImage,
+  getLength,
 } = require("./handlers");
 
 const cookieParser = require("cookie-parser");
@@ -31,6 +32,7 @@ service.use(
   }).unless({
     path: [
       "/api/v1/items/recent",
+      "/api/v1/items/length",
       /^\/api\/v1\/items\/image\/.*/,
       { url: "/api/v1/items/", method: "GET" },
     ],
@@ -39,6 +41,7 @@ service.use(
 
 service.get("/api/v1/items", readHandler);
 service.get("/api/v1/items/user", readByUserHandler);
+service.get("/api/v1/items/length", getLength);
 service.get("/api/v1/items/recent", readActivityHandler);
 service.get("/api/v1/items/image/:id", getImage);
 service.post("/api/v1/items", createHandler);

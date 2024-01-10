@@ -21,7 +21,7 @@ const OrderTile = ({ img, name, quantity, price }) => {
             <Currency
               currency="EUR"
               quantity={price}
-              pattern="! ###,### "
+              pattern="! ###,##0.00 "
               decimal=","
               group="."
             />
