@@ -38,7 +38,7 @@ const read = async () => {
 
 const readByID = async (id) => {
   try {
-    return await supplier.find({ _id: id });
+    return await supplier.findOne({ _id: id });
   } catch (err) {
     throw new Error(err);
   }

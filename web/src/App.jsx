@@ -1,13 +1,18 @@
-import { useEffect, useState } from "react";
+import { useDebugValue, useEffect, useState } from "react";
 import "./Styles/App.css";
-import SignInPage from "./Pages/SignInPage";
+import SignInPage from "./Pages/SignInOptions/SignInPage";
 import MainLayout from "./Pages/MainLayout";
 import Dashboard from "./Components/Dashboard";
 import { ThemeSwitcherProvider } from "react-css-theme-switcher";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Route, Router, Routes, useNavigate } from "react-router-dom";
-import PasswordReset from "./Pages/PasswordReset";
-import Inventory from "./Components/Inventory";
+import PasswordReset from "./Pages/SignInOptions/PasswordReset";
+import Inventory from "./Components/InventoryCategory";
+import { jwtDecode } from "jwt-decode";
+import { setTokenPayload } from "./Slices/DecodedTokenSlice";
+import { sliceCategories } from "./Slices/CategoriesSlice";
+import { sliceItems } from "./Slices/ItemsSlice";
+import { sliceOrders } from "./Slices/OrdersSlice";
 
 const themes = {
   light: "../light.css",
@@ -15,9 +20,13 @@ const themes = {
 };
 
 function App() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [logged, setLogged] = useState(false);
   const [token, setToken] = useState(false);
+  const [items, setItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [orders, setOrders] = useState([]);
   useEffect(() => {
     (async () => {
       const cookieString = document.cookie;
@@ -48,6 +57,39 @@ function App() {
     })();
   }, [useSelector((state) => state.token.value)]);
 
+  useEffect(() => {
+    if (token) {
+      dispatch(setTokenPayload(jwtDecode(token)));
+    }
+  }, [token]);
+
+  useEffect(() => {
+    console.log("checking db");
+    if (logged) {
+      console.log("fetching");
+      (async () => {
+        await fetch("http://localhost:3000/api/v1/categories")
+          .then((data) => data.json())
+          .then((data) => setCategories(data))
+          .catch((err) => console.log(err));
+        await fetch("http://localhost:3000/api/v1/items")
+          .then((data) => data.json())
+          .then((data) => setItems(data))
+          .catch((err) => console.log(err));
+        await fetch("http://localhost:3000/api/v1/orders")
+          .then((data) => data.json())
+          .then((data) => setOrders(data))
+          .catch((err) => console.log(err));
+      })();
+    }
+  }, [logged, useSelector((state) => state.checkDB.value)]);
+
+  useEffect(() => {
+    dispatch(sliceCategories(categories));
+    dispatch(sliceItems(items));
+    dispatch(sliceOrders(orders));
+  }, [categories, items, orders]);
+
   return (
     <ThemeSwitcherProvider
       defaultTheme={useSelector((state) =>
@@ -59,8 +101,8 @@ function App() {
         {logged ? (
           <MainLayout>
             <Routes>
-              <Route path="/" element={<Dashboard token={token} />} />
-              <Route path="/inventory" element={<Inventory token={token} />} />
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/inventory" element={<Inventory />} />
             </Routes>
           </MainLayout>
         ) : (

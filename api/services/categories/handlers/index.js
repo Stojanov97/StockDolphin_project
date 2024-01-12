@@ -1,10 +1,13 @@
 const {
   create,
   read,
+  readByID,
   readByUserID,
   update,
   remove,
 } = require("../../../pkg/categories");
+const activity = require("../../../pkg/activity");
+const pathModule = require("path");
 const {
   CategoryCreate,
   CategoryUpdate,
@@ -27,8 +30,16 @@ const createHandler = async (req, res) => {
       ...{ By: { name: username, id: id } },
     };
     await validate(data, CategoryCreate);
+    // console.log(req);
     let category = await create(data);
     req.files && upload(req.files.photo, "cat", category._id);
+    await activity.create({
+      By: { name: username, id: id },
+      action: "created",
+      what: "category",
+      item: { id: category._id, name: category.name },
+      in: { id: category._id, name: category.name },
+    });
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -40,15 +51,15 @@ const createHandler = async (req, res) => {
 const readHandler = async (req, res) => {
   try {
     let categories = await read();
-    let photos = await downloadAll("cat");
-    categories = categories.map((cat) => {
-      return {
-        ...cat._doc,
-        ...{
-          photo: photos.find(({ id }) => id == cat._doc._id) || false,
-        },
-      };
-    });
+    // let photos = await downloadAll("cat");
+    // categories = categories.map((cat) => {
+    //   return {
+    //     ...cat._doc,
+    //     ...{
+    //       photo: photos.find(({ id }) => id == cat._doc._id) || false,
+    //     },
+    //   };
+    // });
     return await res.json(categories);
   } catch (err) {
     return res
@@ -81,7 +92,6 @@ const readByUserHandler = async (req, res) => {
 const updateHandler = async (req, res) => {
   try {
     const { admin, username, id: userID } = req.auth;
-    console.log(userID); //testiraj
     if (admin === false) throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
     let data = {
@@ -89,8 +99,16 @@ const updateHandler = async (req, res) => {
       ...{ By: { name: username, id: userID } },
     };
     await validate(data, CategoryUpdate);
-    await update(id, data);
     req.files && updateFile(req.files.photo, "cat", id);
+    await update(id, data);
+    let category = await readByID(id);
+    await activity.create({
+      By: { name: username, id: userID },
+      action: "edited",
+      what: "category",
+      item: { id: category._id, name: category.name },
+      in: { id: category._id, name: category.name },
+    });
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -101,11 +119,19 @@ const updateHandler = async (req, res) => {
 
 const deleteHandler = async (req, res) => {
   try {
-    const { admin } = req.auth;
+    const { admin, username, id: userID } = req.auth;
     if (admin === false) throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
+    let category = await readByID(id);
     await remove(id);
     await removeFile("cat", id);
+    await activity.create({
+      By: { name: username, id: userID },
+      action: "deleted",
+      what: "category",
+      item: { id: category._id, name: category.name },
+      in: { id: category._id, name: category.name },
+    });
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -117,13 +143,18 @@ const deleteHandler = async (req, res) => {
 const getImage = async (req, res) => {
   try {
     const path = await downloadByID("cat", req.params.id);
-    return await res.sendFile(path, (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Sent");
+    return await res.sendFile(
+      path.length > 0
+        ? path
+        : pathModule.resolve(__dirname, "../../../uploads/noImgNoProb.jpg"),
+      (err) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("Sent");
+        }
       }
-    });
+    );
   } catch (err) {
     return res
       .status(err.code || 500)

@@ -1,11 +1,12 @@
 const {
   create,
   read,
+  readByID,
   readByItemID,
   update,
   readRecent,
 } = require("../../../pkg/orders");
-const activity = require("../../../pkg/itemActivity");
+const activity = require("../../../pkg/activity");
 const { readByID: itemByID } = require("../../../pkg/items");
 const { OrderCreate, OrderUpdate } = require("../../../pkg/orders/validate");
 const { downloadAll } = require("../../../pkg/files");
@@ -31,7 +32,8 @@ const createHandler = async (req, res) => {
     await create(data);
     await activity.create({
       By: { name: username, id: id },
-      action: "ordered", //za testiranje
+      action: "ordered",
+      what: "order",
       item: { name: req.body.itemName, id: req.body.item },
       in: item.category,
     });
@@ -55,7 +57,9 @@ const readHandler = async (req, res) => {
 
 const readByItemHandler = async (req, res) => {
   try {
-    return res.json(await readByItemID(req.params.item));
+    let test = await readByItemID(req.params.item);
+    let value = test.reduce((acc, curr) => acc + curr.price, 0);
+    return await res.json(value);
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -65,7 +69,7 @@ const readByItemHandler = async (req, res) => {
 
 const updateHandler = async (req, res) => {
   try {
-    const { admin, username } = req.auth;
+    const { admin, username, id: userID } = req.auth;
     if (admin === false) throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
     if (req.body.item || req.body.itemName)
@@ -78,10 +82,19 @@ const updateHandler = async (req, res) => {
       quantity: req.body.quantity,
       price: req.body.price,
       date: req.body.date,
-      By: { name: username, id: id },
+      By: { name: username, id: userID },
     };
     await validate(data, OrderUpdate);
     await update(id, data);
+    let order = await readByID(id);
+    let item = await itemByID(order.item.id);
+    await activity.create({
+      By: { name: username, id: userID },
+      action: "edited",
+      what: "order",
+      item: { name: order.item.name, id: order.item.id },
+      in: item.category,
+    });
     return await res.json({ success: true });
   } catch (err) {
     return res

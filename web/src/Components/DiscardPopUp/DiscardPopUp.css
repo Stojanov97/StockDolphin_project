@@ -1,0 +1,18 @@
+#discardChanges {
+  background-color: var(--background);
+  width: 600px;
+  border-radius: 10px;
+  padding-top: 20px;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  color: var(--primary-text);
+}
+
+#discardChanges > p {
+  font-size: 28px;
+  font-weight: 500;
+}

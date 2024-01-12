@@ -5,6 +5,7 @@ const {
   update,
   remove,
 } = require("../../../pkg/suppliers");
+const activity = require("../../../pkg/activity");
 const {
   SupplierCreate,
   SupplierUpdate,
@@ -17,7 +18,14 @@ const createHandler = async (req, res) => {
     if (admin === false) throw { code: 401, error: "You aren't an admin" };
     let data = { ...req.body, ...{ By: { id: id, name: username } } };
     await validate(data, SupplierCreate);
-    await create(data);
+    let supplier = await create(data);
+    await activity.create({
+      By: { id: id, name: username },
+      action: "created",
+      what: "supplier",
+      item: { name: supplier.name, id: supplier._id },
+      in: { name: supplier.name, id: supplier._id },
+    });
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -44,6 +52,14 @@ const updateHandler = async (req, res) => {
     let data = { ...req.body, ...{ By: { id: userID, name: username } } };
     await validate(data, SupplierUpdate);
     await update(id, data);
+    let supplier = await readByID(id);
+    await activity.create({
+      By: { id: userID, name: username },
+      action: "edited",
+      what: "supplier",
+      item: { name: supplier.name, id: supplier._id },
+      in: { name: supplier.name, id: supplier._id },
+    });
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -54,10 +70,18 @@ const updateHandler = async (req, res) => {
 
 const deleteHandler = async (req, res) => {
   try {
-    const { admin } = req.auth;
+    const { admin, username, id: userID } = req.auth;
     if (admin === false) throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
+    let supplier = await readByID(id);
     await remove(id);
+    await activity.create({
+      By: { id: userID, name: username },
+      action: "deleted",
+      what: "supplier",
+      item: { name: supplier.name, id: supplier._id },
+      in: { name: supplier.name, id: supplier._id },
+    });
     return await res.json({ success: true });
   } catch (err) {
     return res

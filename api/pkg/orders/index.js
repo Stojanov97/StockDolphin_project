@@ -49,9 +49,17 @@ const read = async () => {
   }
 };
 
+const readByID = async (id) => {
+  try {
+    return await order.findOne({ _id: id });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 const readByItemID = async (id) => {
   try {
-    return await order.find({ item: { id: id } });
+    return await order.find({ "item.id": id });
   } catch (err) {
     throw new Error(err);
   }
@@ -78,6 +86,7 @@ const readRecent = async () => {
 module.exports = {
   create,
   read,
+  readByID,
   readByItemID,
   update,
   readRecent,

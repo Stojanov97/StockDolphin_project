@@ -3,10 +3,11 @@ const {
   read,
   readByID,
   readByUserID,
+  readByCategory,
   update,
   remove,
 } = require("../../../pkg/items");
-const activity = require("../../../pkg/itemActivity");
+const activity = require("../../../pkg/activity");
 const {
   ItemCreate,
   ItemUpdate,
@@ -36,6 +37,7 @@ const createHandler = async (req, res) => {
     await activity.create({
       By: { name: username, id: id },
       action: "created",
+      what: "item",
       item: { id: item._id, name: item.name },
       in: { id: req.body.category, name: req.body.categoryName },
     });
@@ -88,6 +90,27 @@ const readByUserHandler = async (req, res) => {
   }
 };
 
+const readByCategoryHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let items = await readByCategory(id);
+    // let photos = await downloadAll("item");
+    // items = items.map((item) => {
+    //   return {
+    //     ...item._doc,
+    //     ...{
+    //       photo: photos.find(({ id }) => id == item._doc._id) || false,
+    //     },
+    //   };
+    // });
+    return res.json(items);
+  } catch (err) {
+    return res
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
+  }
+};
+
 const updateHandler = async (req, res) => {
   try {
     const { admin, username, id: userID } = req.auth;
@@ -99,11 +122,12 @@ const updateHandler = async (req, res) => {
     };
     await validate(data, ItemUpdate);
     let item = await readByID(id);
-    await update(id, data);
     req.files && updateFile(req.files.photo, "item", id);
+    await update(id, data);
     await activity.create({
       By: { name: username, id: userID },
       action: "edited",
+      what: "item",
       item: { id: item._id, name: item.name },
       in: item.category,
     });
@@ -130,6 +154,7 @@ const moveHandler = async (req, res) => {
     await activity.create({
       By: { name: username, id: userID },
       action: "moved",
+      what: "item",
       item: { id: id, name: item.name },
       in: item.category,
     });
@@ -158,6 +183,7 @@ const deleteHandler = async (req, res) => {
     await activity.create({
       By: { name: username, id: userID },
       action: "deleted",
+      what: "item",
       item: { id: item._id, name: item.name },
       in: item.category,
     });
@@ -171,9 +197,7 @@ const deleteHandler = async (req, res) => {
 
 const readActivityHandler = async (req, res) => {
   try {
-    await activity.deleteOld();
-    let activities = await activity.read();
-    return await res.json(activities);
+    return await res.json(await activity.read());
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -212,6 +236,7 @@ module.exports = {
   createHandler,
   readHandler,
   readByUserHandler,
+  readByCategoryHandler,
   updateHandler,
   moveHandler,
   deleteHandler,

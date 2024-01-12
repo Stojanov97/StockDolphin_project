@@ -53,7 +53,16 @@ const readByID = async (id) => {
 
 const readByUserID = async (id) => {
   try {
-    return await item.find({ By: { id: id } });
+    return await item.find({ "By.id": id });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+const readByCategory = async (id) => {
+  try {
+    console.log(await item.find({ "category.id": id }));
+    return await item.find({ "category.id": id });
   } catch (err) {
     throw new Error(err);
   }
@@ -80,6 +89,7 @@ module.exports = {
   read,
   readByID,
   readByUserID,
+  readByCategory,
   update,
   remove,
 };

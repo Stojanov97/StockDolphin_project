@@ -60,7 +60,6 @@ const downloadByID = async (type, id) => {
       .map((value) => {
         return path.normalize(`${destination}/${value}`);
       });
-    console.log(files[0]);
     return files[0];
   } catch (err) {
     if (err.code === "ENOENT") {
@@ -72,6 +71,7 @@ const downloadByID = async (type, id) => {
 };
 
 const upload = (file, type, id) => {
+  console.log(file.size);
   if (MAX_FILESIZE < file.size)
     throw {
       code: 413,
