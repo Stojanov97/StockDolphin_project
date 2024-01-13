@@ -7,6 +7,7 @@ const {
   remove,
 } = require("../../../pkg/categories");
 const activity = require("../../../pkg/activity");
+const { removeByCategory } = require("../../../pkg/items");
 const pathModule = require("path");
 const {
   CategoryCreate,
@@ -125,6 +126,7 @@ const deleteHandler = async (req, res) => {
     let category = await readByID(id);
     await remove(id);
     await removeFile("cat", id);
+    await removeByCategory(id);
     await activity.create({
       By: { name: username, id: userID },
       action: "deleted",

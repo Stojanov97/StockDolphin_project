@@ -3,35 +3,44 @@ import "../Inventory.css";
 import ListOrderIcon from "../../Images/ListOrder.png";
 import TileOrderIcon from "../../Images/TileOrder.png";
 import Currency from "react-currency-formatter";
-import CategoryTile from "../CategoryTile";
+import ItemTile from "../ItemTile";
 import AddIcon from "../../Images/Add.png";
 import SearchIcon from "../../Images/Search.png";
 import { useDispatch, useSelector } from "react-redux";
 import { setListingOrder } from "../../Slices/ListingOrderSlice";
-import AddCategoryPopUp from "../AddCategoryPopUp";
+import AddItemPopUp from "../AddItemPopUp";
 import { checkDB } from "../../Slices/CheckForDBUpdatesSlice";
+import { useParams } from "react-router-dom";
 
-const InventoryCategory = () => {
+const InventoryItem = () => {
+  const { id } = useParams();
   const dispatch = useDispatch();
+  const categories = useSelector((state) => state.categories.value);
+  const allItems = useSelector((state) => state.items.value);
+  // const [items, setItems] = useState([]);
+  // const [category, setCategory] = useState(false);
+  let items = allItems.filter((item) => item.category.id === id);
+  let category = categories.find((cat) => cat._id === id);
+  const [search, setSearch] = useState("");
+  const [addStat, setAddStat] = useState(false);
+  let searchedItems = items.filter((item) =>
+    item.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   useEffect(() => {
     dispatch(checkDB());
   }, []);
-  const categories = useSelector((state) => state.categories.value);
-  const items = useSelector((state) => state.items.value);
-  const orders = useSelector((state) => state.orders.value);
-  const [search, setSearch] = useState("");
-  const [addStat, setAddStat] = useState(false);
-  let searchedCategories = categories.filter((cat) =>
-    cat.name.toLowerCase().includes(search.toLowerCase())
-  );
+
+  console.log(searchedItems);
   const close = () => {
     setAddStat(false);
   };
+
   return (
     <section>
-      {addStat && <AddCategoryPopUp close={close} />}
+      {addStat && <AddItemPopUp close={close} name={category.name} />}
       <div className="breadcrumb">
-        <h1>Inventory</h1>
+        <h1>Inventory &gt; {category && category.name}</h1>
       </div>
       <hr />
       <div id="inventory-workspace">
@@ -40,7 +49,7 @@ const InventoryCategory = () => {
             <img src={SearchIcon} alt="" />
             <input
               type="text"
-              placeholder="Search Categories"
+              placeholder="Search Items"
               onChange={(e) => {
                 setSearch(e.target.value);
               }}
@@ -56,49 +65,27 @@ const InventoryCategory = () => {
               <div className="btn-bg square-bg">
                 <img src={AddIcon} alt="" />
               </div>
-              <span className="btn-text">ADD CATEGORY</span>
+              <span className="btn-text">ADD ITEM</span>
             </button>
           )}
         </div>
         <div id="workspaceDivider">
           <div>
-            <div id="info">
-              <div>
-                Categories: <b>{categories.length}</b>
-              </div>
-              <div>
-                Items: <b>{items.length}</b>
-              </div>
-              <div>
-                Orders: <b>{orders.length}</b>
-              </div>
-              <div>
-                Total Cost:{" "}
-                <b>
-                  {" "}
-                  <Currency
-                    quantity={orders.reduce((acc, curr) => acc + curr.price, 0)}
-                    currency="EUR"
-                    pattern="! ##,##0.00"
-                  />
-                </b>
-              </div>
-            </div>
             <div
-              id="categories"
+              id="items"
               className={
                 useSelector((state) => state.listingOrder.value) === "tile"
                   ? "tile-order"
                   : "list-order"
               }
             >
-              {searchedCategories.length > 0 ? (
-                searchedCategories.map((cat) => (
-                  <CategoryTile
-                    key={cat._id}
-                    id={cat._id}
-                    name={cat.name}
-                    updated={cat.updatedAt}
+              {searchedItems.length > 0 ? (
+                searchedItems.map((item) => (
+                  <ItemTile
+                    key={item._id}
+                    id={item._id}
+                    name={item.name}
+                    updated={item.updatedAt}
                   />
                 ))
               ) : (
@@ -130,4 +117,4 @@ const InventoryCategory = () => {
   );
 };
 
-export default InventoryCategory;
+export default InventoryItem;

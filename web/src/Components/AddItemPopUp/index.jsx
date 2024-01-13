@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
-import "./AddCategoryPopUp.css";
+import "./AddItemPopUp.css";
 import CloseIcon from "../../Images/Close.png";
 import FileUploadIcon from "../../Images/AddImage.png";
 import DiscardPopUp from "../DiscardPopUp";
 import { useDispatch } from "react-redux";
 import { checkDB } from "../../Slices/CheckForDBUpdatesSlice";
+import { useParams } from "react-router-dom";
 
-const AddCategoryPopUp = ({ close }) => {
+const AddItemPopUp = ({ close, name: categoryName }) => {
   const dispatch = useDispatch();
   const [name, setName] = useState("");
   const [image, setImage] = useState(false);
   const [file, setFile] = useState(false);
   const [showDiscard, setShowDiscard] = useState(false);
   const [error, setError] = useState(false);
+  const { id } = useParams();
   const closeDiscard = () => {
     setShowDiscard(false);
   };
@@ -30,7 +32,7 @@ const AddCategoryPopUp = ({ close }) => {
           <DiscardPopUp close={close} closeDiscard={closeDiscard} />
         )}
         <div className="header">
-          <h1>Add Category</h1>
+          <h1>Add Item</h1>
           <img
             className="close-icon"
             src={CloseIcon}
@@ -105,14 +107,17 @@ const AddCategoryPopUp = ({ close }) => {
               e.preventDefault();
               let data = new FormData();
               data.append("name", name);
+              data.append("category", id);
+              data.append("categoryName", categoryName);
               if (file) data.append("photo", file);
               console.log(data);
-              await fetch("http://localhost:3000/api/v1/categories", {
+              await fetch("http://localhost:3000/api/v1/items", {
                 method: "POST",
                 body: data,
               })
                 .then((data) => data.json())
                 .then((data) => {
+                  console.log(data);
                   if (data.success === true) {
                     setError(false);
                     dispatch(checkDB());
@@ -124,7 +129,7 @@ const AddCategoryPopUp = ({ close }) => {
                 .catch((err) => console.log(err));
             }}
           >
-            ADD CATEGORY
+            ADD ITEM
           </button>
         </div>
       </div>
@@ -132,4 +137,4 @@ const AddCategoryPopUp = ({ close }) => {
   );
 };
 
-export default AddCategoryPopUp;
+export default AddItemPopUp;

@@ -21,6 +21,7 @@ const {
   removeFile,
   downloadByID,
 } = require("../../../pkg/files");
+const pathModule = require("path");
 
 const createHandler = async (req, res) => {
   try {
@@ -208,13 +209,18 @@ const readActivityHandler = async (req, res) => {
 const getImage = async (req, res) => {
   try {
     const path = await downloadByID("item", req.params.id);
-    return await res.sendFile(path, (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Sent");
+    return await res.sendFile(
+      path.length > 0
+        ? path
+        : pathModule.resolve(__dirname, "../../../uploads/noImgNoProb.jpg"),
+      (err) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("Sent");
+        }
       }
-    });
+    );
   } catch (err) {
     return res
       .status(err.code || 500)

@@ -7,12 +7,13 @@ import { ThemeSwitcherProvider } from "react-css-theme-switcher";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Router, Routes, useNavigate } from "react-router-dom";
 import PasswordReset from "./Pages/SignInOptions/PasswordReset";
-import Inventory from "./Components/InventoryCategory";
+import InventoryCategory from "./Components/InventoryCategory";
 import { jwtDecode } from "jwt-decode";
 import { setTokenPayload } from "./Slices/DecodedTokenSlice";
 import { sliceCategories } from "./Slices/CategoriesSlice";
 import { sliceItems } from "./Slices/ItemsSlice";
 import { sliceOrders } from "./Slices/OrdersSlice";
+import InventoryItem from "./Components/InventoryItem";
 
 const themes = {
   light: "../light.css",
@@ -102,7 +103,8 @@ function App() {
           <MainLayout>
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/inventory" element={<Inventory />} />
+              <Route path="/inventory" element={<InventoryCategory />} />
+              <Route path="/inventory/:id" element={<InventoryItem />} />
             </Routes>
           </MainLayout>
         ) : (

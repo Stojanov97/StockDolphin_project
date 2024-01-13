@@ -61,7 +61,6 @@ const readByUserID = async (id) => {
 
 const readByCategory = async (id) => {
   try {
-    console.log(await item.find({ "category.id": id }));
     return await item.find({ "category.id": id });
   } catch (err) {
     throw new Error(err);
@@ -84,6 +83,14 @@ const remove = async (id) => {
   }
 };
 
+const removeByCategory = async (id) => {
+  try {
+    return await item.deleteMany({ "category.id": id });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   create,
   read,
@@ -92,4 +99,5 @@ module.exports = {
   readByCategory,
   update,
   remove,
+  removeByCategory,
 };

@@ -46,7 +46,8 @@
   margin-bottom: 20px;
 }
 
-#categories {
+#categories,
+#items {
   height: 580px;
   overflow: scroll;
   gap: 35px;
@@ -63,6 +64,10 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.list-order-tile > .info > .top {
+  width: 240px;
 }
 
 .order-type-btn {

@@ -89,6 +89,20 @@
   width: 50%;
 }
 
+.tile-numbers-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tile-numbers-item > p {
+  font-size: 14px;
+}
+
+.tile-numbers-item > .vl {
+  padding-right: 5px;
+}
+
 .bottom {
   display: flex;
   justify-content: space-between;
