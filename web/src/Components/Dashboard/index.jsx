@@ -1,26 +1,26 @@
 import React, { useEffect, useState } from "react";
-import user from "../../Images/User.png";
-import ActivityTile from "../ActivityTile";
-import OrderTile from "../OrderTile";
+import { useSelector } from "react-redux";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
+import Currency from "react-currency-formatter";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import "./Dashboard.css";
-import DashboardSummaryTile from "../DashboardSummary";
 import DocumentIcon from "../../Images/Documents.png";
 import FolderIcon from "../../Images/Folder.png";
 import ListIcon from "../../Images/Paper.png";
 import CoinsIcon from "../../Images/Coins.png";
-import Currency from "react-currency-formatter";
-import { useSelector } from "react-redux";
+import user from "../../Images/User.png";
+import ActivityTile from "../Tiles/Activity";
+import OrderTile from "../Tiles/Order";
+import DashboardSummaryTile from "../Tiles/DashboardSummary";
+import "./Dashboard.css";
 
 const Dashboard = () => {
   const decoded = useSelector((state) => state.decodedToken.value);
   const catNum = useSelector((state) => state.categories.value.length);
   const itemNum = useSelector((state) => state.items.value.length);
   const orderNum = useSelector((state) => state.orders.value.length);
-  const orderTotal = useSelector((state) =>
-    state.orders.value.reduce((acc, curr) => acc + curr.price, 0)
+  const invoicesTotal = useSelector((state) =>
+    state.invoices.value.reduce((acc, curr) => acc + curr.total, 0)
   );
   const [activities, setActivities] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -49,7 +49,13 @@ const Dashboard = () => {
   return (
     <section>
       <div className="breadcrumb">
-        <h1>Dashboard</h1>
+        <h1
+          onClick={() => {
+            window.location.reload(false);
+          }}
+        >
+          Dashboard
+        </h1>
         <div className="greeting">
           <h1>
             Welcome {decoded && decoded.name} {decoded && decoded.lastName}
@@ -89,7 +95,7 @@ const Dashboard = () => {
               color={"#ffd5c0"}
               amount={
                 <Currency
-                  quantity={orderTotal}
+                  quantity={invoicesTotal}
                   pattern="! #,### "
                   currency="EUR"
                 />
@@ -160,7 +166,7 @@ const Dashboard = () => {
                   {orderList.map((order) => (
                     <OrderTile
                       key={order._id}
-                      img={order.item.id}
+                      id={order.item.id}
                       name={order.item.name}
                       quantity={order.quantity}
                       price={order.price}

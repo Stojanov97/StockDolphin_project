@@ -1,23 +1,26 @@
-import { useDebugValue, useEffect, useState } from "react";
-import "./Styles/App.css";
-import SignInPage from "./Pages/SignInOptions/SignInPage";
-import MainLayout from "./Pages/MainLayout";
-import Dashboard from "./Components/Dashboard";
-import { ThemeSwitcherProvider } from "react-css-theme-switcher";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Route, Router, Routes, useNavigate } from "react-router-dom";
-import PasswordReset from "./Pages/SignInOptions/PasswordReset";
-import InventoryCategory from "./Components/InventoryCategory";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { ThemeSwitcherProvider } from "react-css-theme-switcher";
 import { setTokenPayload } from "./Slices/DecodedTokenSlice";
 import { sliceCategories } from "./Slices/CategoriesSlice";
 import { sliceItems } from "./Slices/ItemsSlice";
 import { sliceOrders } from "./Slices/OrdersSlice";
-import InventoryItem from "./Components/InventoryItem";
+import { sliceSuppliers } from "./Slices/SuppliersSlice";
+import { sliceInvoices } from "./Slices/InvoicesSlice";
+import "./Styles/App.css";
+import SignInPage from "./Pages/SignInOptions/SignInPage";
+import PasswordReset from "./Pages/SignInOptions/PasswordReset";
+import MainLayout from "./Pages/MainLayout";
+import Dashboard from "./Components/Dashboard";
+import CategoryInventory from "./Components/CategoryInventory";
+import ItemInventory from "./Components/ItemInventory";
+import OrderInventory from "./Components/OrderInventory";
 
 const themes = {
-  light: "../light.css",
-  dark: "../dark.css",
+  light: `${__dirname}../light.css`,
+  dark: `${__dirname}../dark.css`,
 };
 
 function App() {
@@ -28,6 +31,8 @@ function App() {
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [invoices, setInvoices] = useState([]);
   useEffect(() => {
     (async () => {
       const cookieString = document.cookie;
@@ -51,12 +56,14 @@ function App() {
           } else {
             setToken(false);
             setLogged(false);
-            navigate("/");
+            if (window.location.pathname !== "/resetPassword") {
+              navigate("/");
+            }
           }
         })
         .catch((err) => console.log(err));
     })();
-  }, [useSelector((state) => state.token.value)]);
+  }, [useSelector((state) => state.checkToken.value)]);
 
   useEffect(() => {
     if (token) {
@@ -65,7 +72,6 @@ function App() {
   }, [token]);
 
   useEffect(() => {
-    console.log("checking db");
     if (logged) {
       console.log("fetching");
       (async () => {
@@ -81,6 +87,14 @@ function App() {
           .then((data) => data.json())
           .then((data) => setOrders(data))
           .catch((err) => console.log(err));
+        await fetch("http://localhost:3000/api/v1/suppliers")
+          .then((data) => data.json())
+          .then((data) => setSuppliers(data))
+          .catch((err) => console.log(err));
+        await fetch("http://localhost:3000/api/v1/invoices")
+          .then((data) => data.json())
+          .then((data) => setInvoices(data))
+          .catch((err) => console.log(err));
       })();
     }
   }, [logged, useSelector((state) => state.checkDB.value)]);
@@ -89,7 +103,9 @@ function App() {
     dispatch(sliceCategories(categories));
     dispatch(sliceItems(items));
     dispatch(sliceOrders(orders));
-  }, [categories, items, orders]);
+    dispatch(sliceSuppliers(suppliers));
+    dispatch(sliceInvoices(invoices));
+  }, [categories, items, orders, suppliers, invoices]);
 
   return (
     <ThemeSwitcherProvider
@@ -103,8 +119,9 @@ function App() {
           <MainLayout>
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/inventory" element={<InventoryCategory />} />
-              <Route path="/inventory/:id" element={<InventoryItem />} />
+              <Route path="/inventory" element={<CategoryInventory />} />
+              <Route path="/inventory/:id" element={<ItemInventory />} />
+              <Route path="/inventory/item/:id" element={<OrderInventory />} />
             </Routes>
           </MainLayout>
         ) : (

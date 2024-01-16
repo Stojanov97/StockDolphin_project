@@ -7,6 +7,7 @@ const allowCrossDomain = (req, res, next) => {
   res.header(`Access-Control-Allow-Origin`, `*`);
   res.header(`Access-Control-Allow-Methods`, `GET,PUT,PATCH,POST,DELETE`);
   res.header(`Access-Control-Allow-Headers`, `Content-Type`);
+  res.header(`Access-Control-Allow-Credentials`, true);
   next();
 };
 
@@ -56,6 +57,16 @@ app.use(
   proxy(`http://127.0.0.1:${config("SUPPLIERS_SERVICE_PORT")}`, {
     proxyReqPathResolver: (req) =>
       `http://127.0.0.1:${config("SUPPLIERS_SERVICE_PORT")}/api/v1/suppliers${
+        req.url
+      }`,
+  })
+);
+
+app.use(
+  "/api/v1/invoices",
+  proxy(`http://127.0.0.1:${config("INVOICES_SERVICE_PORT")}`, {
+    proxyReqPathResolver: (req) =>
+      `http://127.0.0.1:${config("INVOICES_SERVICE_PORT")}/api/v1/invoices${
         req.url
       }`,
   })

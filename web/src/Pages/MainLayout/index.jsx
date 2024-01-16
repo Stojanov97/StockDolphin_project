@@ -5,11 +5,12 @@ import inventory from "../../Images/Inventory.png";
 import reports from "../../Images/Reports.png";
 import signOut from "../../Images/LogOut.png";
 import "./mainLayout.css";
-import themeIcon from "../../Images/theme.png";
+import themeIcon from "../../Images/Theme.png";
 import { useDispatch, useSelector } from "react-redux";
 import { useThemeSwitcher } from "react-css-theme-switcher";
 import { toggle } from "../../Slices/ThemeSlice";
 import { check } from "../../Slices/CheckTokenSlice";
+import { checkDB } from "../../Slices/CheckForDBUpdatesSlice";
 import { useNavigate } from "react-router-dom";
 
 const MainLayout = ({ children }) => {
@@ -31,6 +32,7 @@ const MainLayout = ({ children }) => {
             className="logo btn"
             onClick={() => {
               dispatch(check());
+              dispatch(checkDB());
               navigate("/");
             }}
           />
@@ -38,6 +40,7 @@ const MainLayout = ({ children }) => {
             className="nav-btn"
             onClick={() => {
               dispatch(check());
+              dispatch(checkDB());
               navigate("/");
             }}
           >
@@ -48,6 +51,7 @@ const MainLayout = ({ children }) => {
             className="nav-btn"
             onClick={() => {
               dispatch(check());
+              dispatch(checkDB());
               navigate("/inventory");
             }}
           >
@@ -58,6 +62,7 @@ const MainLayout = ({ children }) => {
             className="nav-btn"
             onClick={() => {
               dispatch(check());
+              dispatch(checkDB());
               navigate("/reports");
             }}
           >
@@ -69,6 +74,7 @@ const MainLayout = ({ children }) => {
             id="supplier-btn"
             onClick={() => {
               dispatch(check());
+              dispatch(checkDB());
               navigate("/suppliers");
             }}
           >

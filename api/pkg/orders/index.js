@@ -19,6 +19,13 @@ const OrderScheme = new mongoose.Schema(
         ref: "item",
       },
     },
+    category: {
+      name: { type: String, required: true },
+      id: {
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "category",
+      },
+    },
     By: {
       name: { type: String, required: true },
       id: {
@@ -83,6 +90,22 @@ const readRecent = async () => {
   }
 };
 
+const removeByCategory = async (id) => {
+  try {
+    return await order.deleteMany({ "category.id": id });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+const removeByItem = async (id) => {
+  try {
+    return await order.deleteMany({ "item.id": id });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   create,
   read,
@@ -90,4 +113,6 @@ module.exports = {
   readByItemID,
   update,
   readRecent,
+  removeByCategory,
+  removeByItem,
 };

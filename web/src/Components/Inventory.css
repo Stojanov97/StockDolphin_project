@@ -2,6 +2,10 @@
   margin: 10px 0 0 60px;
 }
 
+#item-workspace {
+  margin: 10px 0;
+}
+
 .search-input {
   position: relative;
 }
@@ -36,6 +40,13 @@
   grid-template-columns: 1fr 200px;
 }
 
+#itemWorkspaceDivider {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+}
+
 #info {
   color: var(--primary-text);
   cursor: default;
@@ -43,7 +54,9 @@
   justify-content: start;
   align-items: center;
   gap: 30px;
+  margin-top: 10px;
   margin-bottom: 20px;
+  font-size: 22px;
 }
 
 #categories,
@@ -80,4 +93,54 @@
   display: flex;
   flex-direction: column;
   align-items: end;
+}
+
+.right-side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px 10px;
+}
+
+#editCategoryBtn {
+  position: absolute;
+  bottom: 30px;
+  right: 70px;
+}
+
+#orderTableContainer {
+  position: relative;
+  margin: 10px 0 0 10px;
+  height: 630px;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: var(--third-color);
+  overflow: scroll;
+  cursor: default;
+}
+
+#invoiceBtn {
+  padding: 5px 20px;
+  cursor: pointer;
+}
+
+#orderTable {
+  width: calc(100% - 10px);
+  border-collapse: collapse;
+  color: var(--primary-text);
+  table-layout: fixed;
+}
+
+th {
+  border-bottom: 1px solid var(--primary-text);
+  font-size: 28px;
+  font-weight: 400;
+  padding: 25px 0 5px 0;
+}
+
+td {
+  font-size: 20px;
+  text-align: center;
+  width: 20%;
+  padding: 10px 0;
 }

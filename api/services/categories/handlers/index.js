@@ -8,6 +8,7 @@ const {
 } = require("../../../pkg/categories");
 const activity = require("../../../pkg/activity");
 const { removeByCategory } = require("../../../pkg/items");
+const { removeByCategory: removeOrders } = require("../../../pkg/orders");
 const pathModule = require("path");
 const {
   CategoryCreate,
@@ -101,6 +102,9 @@ const updateHandler = async (req, res) => {
     };
     await validate(data, CategoryUpdate);
     req.files && updateFile(req.files.photo, "cat", id);
+    if (!req.files) {
+      await removeFile("cat", id);
+    }
     await update(id, data);
     let category = await readByID(id);
     await activity.create({
@@ -127,6 +131,7 @@ const deleteHandler = async (req, res) => {
     await remove(id);
     await removeFile("cat", id);
     await removeByCategory(id);
+    await removeOrders(id);
     await activity.create({
       By: { name: username, id: userID },
       action: "deleted",

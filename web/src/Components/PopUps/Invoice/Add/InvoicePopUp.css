@@ -1,0 +1,56 @@
+#invoicePopUp {
+  background-color: var(--background);
+  width: 600px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+select,
+#orders {
+  width: 90%;
+  font-size: 30px;
+  font-weight: 500;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  color: #959595;
+  border-bottom: 1px solid var(--primary-text);
+  padding: 10px;
+}
+
+.css-1fdsijx-ValueContainer {
+  background-color: var(--background);
+}
+.css-1nmdiq5-menu {
+  scroll-behavior: smooth;
+  scroll-snap-type: none;
+  height: 130px;
+  overflow: scroll;
+}
+option {
+  font-size: 20px;
+  font-weight: 500;
+  color: #959595;
+  outline: none;
+  text-decoration: none;
+  background-color: var(--background);
+}
+
+#date {
+  margin-left: 30px;
+  align-self: flex-start;
+  border-radius: 10px;
+  padding: 5px;
+  font-size: 25px;
+  color: #959595;
+  border: 1px solid var(--primary-text);
+  width: 40%;
+}
+.selected-op {
+  background-color: red;
+}

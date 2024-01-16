@@ -24,7 +24,8 @@
 }
 
 .list-order-tile > .thumb {
-  width: 250px;
+  min-width: 250px;
+  max-width: 250px;
   height: auto;
 }
 
@@ -79,27 +80,36 @@
 }
 
 .tile-numbers {
-  width: 150px;
   display: flex;
+  width: 200px;
 }
 
 .tile-numbers > p {
   font-size: 14px;
   text-align: center;
   width: 50%;
+  padding-left: 5px;
+}
+
+.tile-numbers > .vl {
+  padding-left: 0;
+  padding-right: 5px;
 }
 
 .tile-numbers-item {
+  width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: start;
   align-items: center;
 }
 
 .tile-numbers-item > p {
-  font-size: 14px;
+  font-size: 12px;
+  padding-left: 5px;
 }
 
 .tile-numbers-item > .vl {
+  padding-left: 0;
   padding-right: 5px;
 }
 

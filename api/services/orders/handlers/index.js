@@ -16,26 +16,20 @@ const createHandler = async (req, res) => {
   try {
     const { admin, username, id } = req.auth;
     if (admin === false) throw { code: 401, error: "You aren't an admin" };
+    console.log(req.body);
     let data = {
-      supplier: {
-        name: req.body.supplierName,
-        id: req.body.supplier,
-      },
-      quantity: req.body.quantity,
-      price: req.body.price,
-      date: req.body.date,
-      item: { name: req.body.itemName, id: req.body.item },
+      ...req.body,
       By: { name: username, id: id },
     };
     await validate(data, OrderCreate);
-    let item = await itemByID(req.body.item);
     await create(data);
+    console.log("tuka");
     await activity.create({
       By: { name: username, id: id },
       action: "ordered",
       what: "order",
-      item: { name: req.body.itemName, id: req.body.item },
-      in: item.category,
+      item: req.body.item,
+      in: req.body.category,
     });
     return await res.json({ success: true });
   } catch (err) {
@@ -72,7 +66,12 @@ const updateHandler = async (req, res) => {
     const { admin, username, id: userID } = req.auth;
     if (admin === false) throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
-    if (req.body.item || req.body.itemName)
+    if (
+      req.body.item ||
+      req.body.itemName ||
+      req.body.categoryName ||
+      req.body.category
+    )
       throw { code: 400, error: "You can't change the item" };
     let data = {
       supplier: {

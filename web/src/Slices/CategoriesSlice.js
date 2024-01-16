@@ -5,7 +5,7 @@ const initialState = {
 };
 
 export const CategoriesSlice = createSlice({
-  name: "items",
+  name: "categries",
   initialState,
   reducers: {
     sliceCategories: (state, action) => {

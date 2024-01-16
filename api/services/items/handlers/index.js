@@ -21,6 +21,7 @@ const {
   removeFile,
   downloadByID,
 } = require("../../../pkg/files");
+const { removeByItem } = require("../../../pkg/orders");
 const pathModule = require("path");
 
 const createHandler = async (req, res) => {
@@ -124,6 +125,9 @@ const updateHandler = async (req, res) => {
     await validate(data, ItemUpdate);
     let item = await readByID(id);
     req.files && updateFile(req.files.photo, "item", id);
+    if (!req.files) {
+      await removeFile("item", id);
+    }
     await update(id, data);
     await activity.create({
       By: { name: username, id: userID },
@@ -181,6 +185,7 @@ const deleteHandler = async (req, res) => {
     let item = await readByID(id);
     await remove(id);
     await removeFile("item", id);
+    await removeByItem(id);
     await activity.create({
       By: { name: username, id: userID },
       action: "deleted",
