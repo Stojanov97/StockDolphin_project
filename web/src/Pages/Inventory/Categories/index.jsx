@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setListingOrder } from "../../Slices/ListingOrderSlice";
-import { checkDB } from "../../Slices/CheckForDBUpdatesSlice";
+import { setListingOrder } from "../../../Slices/ListingOrderSlice";
+import { checkDB } from "../../../Slices/CheckForDBUpdatesSlice";
 import Currency from "react-currency-formatter";
 import "../Inventory.css";
-import ListOrderIcon from "../../Images/ListOrder.png";
-import TileOrderIcon from "../../Images/TileOrder.png";
-import AddIcon from "../../Images/Add.png";
-import SearchIcon from "../../Images/Search.png";
-import CategoryTile from "../Tiles/Category";
-import AddCategoryPopUp from "../PopUps/Category/Add";
+import ListOrderIcon from "../../../Images/ListOrder.png";
+import TileOrderIcon from "../../../Images/TileOrder.png";
+import AddIcon from "../../../Images/Add.png";
+import SearchIcon from "../../../Images/Search.png";
+import CategoryTile from "../../../Components/Tiles/Category";
+import AddCategoryPopUp from "../../../Components/PopUps/Category/Add";
 
 const InventoryCategory = () => {
   const dispatch = useDispatch();

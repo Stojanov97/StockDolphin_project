@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Currency from "react-currency-formatter";
-import "../../DefaultTile.css";
+import "../DefaultTile.css";
 import DeleteIcon from "../../../Images/Delete.png";
 import DeleteCategoryPopUp from "../../PopUps/Category/Delete";
 

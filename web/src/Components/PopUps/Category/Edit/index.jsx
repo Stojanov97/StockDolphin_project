@@ -87,6 +87,7 @@ const EditCategoryPopUp = ({ close, name: categoryName }) => {
               if (image) {
                 e.preventDefault();
                 setImage(false);
+                setFile(false);
               }
             }}
             onChange={(e) => {
@@ -117,8 +118,9 @@ const EditCategoryPopUp = ({ close, name: categoryName }) => {
               }
               let data = new FormData();
               data.append("name", name);
-              if (file !== "old") {
-                console.log(file);
+              if (!file) {
+                data.append("removePhoto", "true");
+              } else if (file !== "old") {
                 data.append("photo", file);
               }
               await fetch(`http://localhost:3000/api/v1/categories/${id}`, {

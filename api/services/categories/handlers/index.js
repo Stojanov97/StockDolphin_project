@@ -102,7 +102,7 @@ const updateHandler = async (req, res) => {
     };
     await validate(data, CategoryUpdate);
     req.files && updateFile(req.files.photo, "cat", id);
-    if (!req.files) {
+    if (req.body.removePhoto === "true") {
       await removeFile("cat", id);
     }
     await update(id, data);

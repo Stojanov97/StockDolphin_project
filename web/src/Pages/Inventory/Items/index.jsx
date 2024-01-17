@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setListingOrder } from "../../Slices/ListingOrderSlice";
-import { checkDB } from "../../Slices/CheckForDBUpdatesSlice";
+import { setListingOrder } from "../../../Slices/ListingOrderSlice";
+import { checkDB } from "../../../Slices/CheckForDBUpdatesSlice";
 import "../Inventory.css";
-import ListOrderIcon from "../../Images/ListOrder.png";
-import TileOrderIcon from "../../Images/TileOrder.png";
-import AddIcon from "../../Images/Add.png";
-import EditIcon from "../../Images/Edit.png";
-import SearchIcon from "../../Images/Search.png";
-import ItemTile from "../Tiles/Item";
-import AddItemPopUp from "../PopUps/Item/Add";
-import EditCategoryPopUp from "../PopUps/Category/Edit";
+import ListOrderIcon from "../../../Images/ListOrder.png";
+import TileOrderIcon from "../../../Images/TileOrder.png";
+import AddIcon from "../../../Images/Add.png";
+import EditIcon from "../../../Images/Edit.png";
+import SearchIcon from "../../../Images/Search.png";
+import ItemTile from "../../../Components/Tiles/Item";
+import AddItemPopUp from "../../../Components/PopUps/Item/Add";
+import EditCategoryPopUp from "../../../Components/PopUps/Category/Edit";
 
 const InventoryItem = () => {
   const { id } = useParams();

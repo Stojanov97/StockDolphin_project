@@ -9,18 +9,25 @@ import Select from "react-select";
 
 const AddInvoicePopUp = ({ close, item, orders }) => {
   const dispatch = useDispatch();
-  const options = orders.map((order) => ({
+  let suppliers = useSelector((state) => state.suppliers.value);
+
+  const orderOptions = orders.map((order) => ({
     value: order,
     label: `${order.supplier.name} | ${order.quantity} unit${
-      order.quantity > 1 && "s"
+      order.quantity > 1 ? "s" : ""
     } | ${order.price}€`,
   }));
+  const supplierOptions = suppliers.map((sup) => ({
+    value: sup,
+    label: sup.name,
+  }));
+
   const [selectedOrders, setSelectedOrders] = useState([]);
-  let suppliers = useSelector((state) => state.suppliers.value);
   let ordersMapped = selectedOrders.map((order) => ({
     id: order.value._id,
     price: order.value.price,
   }));
+
   const [supplier, setSupplier] = useState(false);
   const [date, setDate] = useState(false);
   const [name, setName] = useState(false);
@@ -29,6 +36,57 @@ const AddInvoicePopUp = ({ close, item, orders }) => {
   const closeDiscard = () => {
     setShowDiscard(false);
   };
+
+  const customStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      border: "none",
+      outline: "none",
+      cursor: "pointer",
+      backgroundColor: "transparent",
+      ":focus": {
+        outline: "green",
+        border: "none",
+      },
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: "var(--background)",
+      color: "var(--primary-text)",
+      border: "none",
+      outline: "none",
+      height: "50px",
+      cursor: "pointer",
+    }),
+    menu: (provided, state) => ({
+      ...provided,
+      maxHeight: "330px",
+      overflow: "scroll",
+      backgroundColor: "transparent",
+      width: "520px",
+    }),
+    valueContainer: (provided, state) => ({
+      ...provided,
+      display: "flex",
+      flexDirection: "row",
+      flexWrap: "nowrap",
+      overflow: "scroll",
+    }),
+    multiValue: (provided, state) => ({
+      ...provided,
+      flexShrink: "0",
+      backgroundColor: "var(--primary-color)",
+    }),
+    singleValue: (provided, state) => ({
+      ...provided,
+      color: "var(--primary-text)",
+    }),
+    multiValueLabel: (provided, state) => ({
+      ...provided,
+      color: "var(--primary-text)",
+    }),
+  };
+  console.log(supplier);
   return (
     <div className="backdrop">
       <div className="pop-up" id="invoicePopUp">
@@ -69,7 +127,15 @@ const AddInvoicePopUp = ({ close, item, orders }) => {
               setName(e.target.value);
             }}
           />
-          {suppliers.length > 0 ? (
+          <Select
+            id="orders"
+            placeholder="Supplier*"
+            value={supplier}
+            onChange={setSupplier}
+            options={supplierOptions}
+            styles={customStyles}
+          />
+          {/* {suppliers.length > 0 ? (
             <select
               name="suppliers"
               id="suppliers"
@@ -95,7 +161,7 @@ const AddInvoicePopUp = ({ close, item, orders }) => {
             </select>
           ) : (
             <h2 className="na">No suppliers available</h2>
-          )}
+          )} */}
           <input
             type="date"
             name="date"
@@ -112,7 +178,8 @@ const AddInvoicePopUp = ({ close, item, orders }) => {
             placeholder="Select Orders*"
             value={selectedOrders}
             onChange={setSelectedOrders}
-            options={options}
+            options={orderOptions}
+            styles={customStyles}
             isMulti
             closeMenuOnSelect={false}
           />
@@ -123,7 +190,7 @@ const AddInvoicePopUp = ({ close, item, orders }) => {
           <button
             onClick={() => {
               if (
-                supplier ||
+                supplier.value.name.length > 0 ||
                 name.length > 0 ||
                 selectedOrders.length > 0 ||
                 date.length > 0
@@ -139,7 +206,6 @@ const AddInvoicePopUp = ({ close, item, orders }) => {
           <button
             type="submit"
             onClick={async (e) => {
-              console.log(supplier);
               e.preventDefault();
               if (name.length < 1 || !name) {
                 return setError("Please enter a name for the invoice");
@@ -161,7 +227,10 @@ const AddInvoicePopUp = ({ close, item, orders }) => {
                 },
                 body: JSON.stringify({
                   name: name,
-                  supplier: supplier,
+                  supplier: {
+                    name: supplier.value.name,
+                    id: supplier.value._id,
+                  },
                   date: date,
                   orders: ordersMapped,
                   item: { name: item.name, id: item._id },

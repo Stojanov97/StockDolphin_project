@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { checkDB } from "../../Slices/CheckForDBUpdatesSlice";
+import { checkDB } from "../../../Slices/CheckForDBUpdatesSlice";
 import { useNavigate, useParams } from "react-router-dom";
 import Currency from "react-currency-formatter";
 import "../Inventory.css";
-import AddIcon from "../../Images/Add.png";
-import SortIcon from "../../Images/Sort.png";
-import AddOrderPopUp from "../PopUps/Order/Add";
-import AddInvoicePopUp from "../PopUps/Invoice/Add";
-import EditItem from "../PopUps/Item/Edit";
+import AddIcon from "../../../Images/Add.png";
+import SortIcon from "../../../Images/Sort.png";
+import AddOrderPopUp from "../../../Components/PopUps/Order/Add";
+import AddInvoicePopUp from "../../../Components/PopUps/Invoice/Add";
+import EditItem from "../../../Components/PopUps/Item/Edit";
 
 const OrderInventory = () => {
   const { id } = useParams();

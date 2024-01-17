@@ -9,9 +9,9 @@ import FolderIcon from "../../Images/Folder.png";
 import ListIcon from "../../Images/Paper.png";
 import CoinsIcon from "../../Images/Coins.png";
 import user from "../../Images/User.png";
-import ActivityTile from "../Tiles/Activity";
-import OrderTile from "../Tiles/Order";
-import DashboardSummaryTile from "../Tiles/DashboardSummary";
+import ActivityTile from "../../Components/Tiles/Activity";
+import OrderTile from "../../Components/Tiles/Order";
+import DashboardSummaryTile from "../../Components/Tiles/DashboardSummary";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -45,7 +45,7 @@ const Dashboard = () => {
       return chunks;
     }, []);
   };
-
+  console.log(activities);
   return (
     <section>
       <div className="breadcrumb">
@@ -108,14 +108,14 @@ const Dashboard = () => {
           <h1 className="section-title">Recent Activity</h1>
           {activities.length > 0 ? (
             <div id="activityList">
-              {activities.map(({ _id, By, action, item, what, in: cat }) => (
+              {activities.map(({ _id, By, action, item, what, in: t }) => (
                 <ActivityTile
                   key={_id}
                   by={By.name}
                   what={what}
                   action={action}
                   item={item.name}
-                  cat={cat.name}
+                  cat={t.name}
                 />
               ))}
             </div>

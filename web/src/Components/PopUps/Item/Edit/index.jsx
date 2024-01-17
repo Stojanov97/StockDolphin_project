@@ -12,6 +12,7 @@ import MoveItemPopUp from "../Move";
 
 const EditItem = ({ id }) => {
   const dispatch = useDispatch();
+  const { admin } = useSelector((state) => state.decodedToken.value);
   const items = useSelector((state) => state.items.value);
   const [item, setItem] = useState(false);
   const [name, setName] = useState("");
@@ -39,10 +40,14 @@ const EditItem = ({ id }) => {
       setError(false);
     }
   }, [file]);
+
+  console.log(file);
+
   return (
     <>
       {showMove && (
         <MoveItemPopUp
+          id={id}
           close={() => {
             setShowMove(false);
           }}
@@ -58,7 +63,9 @@ const EditItem = ({ id }) => {
             {image ? (
               <>
                 <img src={image} alt="chosen image" className="chosen-image" />
-                <img src={GreenEditIcon} alt="" id="editItemImageEditBtn" />
+                {admin && (
+                  <img src={GreenEditIcon} alt="" id="editItemImageEditBtn" />
+                )}
               </>
             ) : (
               <>
@@ -73,6 +80,7 @@ const EditItem = ({ id }) => {
               type="text"
               required
               placeholder="Name*"
+              disabled={!admin}
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
@@ -85,10 +93,12 @@ const EditItem = ({ id }) => {
             id="fileUpload"
             name="fileUpload"
             accept=".jpg, .jpeg"
+            disabled={!admin}
             onClick={(e) => {
               if (image) {
                 e.preventDefault();
                 setImage(false);
+                setFile(false);
               }
             }}
             onChange={(e) => {
@@ -96,47 +106,52 @@ const EditItem = ({ id }) => {
               setImage(URL.createObjectURL(e.target.files[0]));
             }}
           />
-          <div id="editItemActions">
-            <button
-              className="interaction-btn"
-              onClick={() => {
-                setShowMove(true);
-              }}
-            >
-              <img src={MoveIcon} alt="" />
-            </button>
-            <button
-              className="interaction-btn"
-              onClick={async (e) => {
-                e.preventDefault();
-                if (name.length < 1) {
-                  return setError("Name is required");
-                }
-                let data = new FormData();
-                data.append("name", name);
-                if (file !== "old") {
-                  data.append("photo", file);
-                }
-                await fetch(`http://localhost:3000/api/v1/items/${id}`, {
-                  method: "PATCH",
-                  body: data,
-                })
-                  .then((data) => data.json())
-                  .then((data) => {
-                    console.log(data);
-                    if (data.success === true) {
-                      setError(false);
-                      dispatch(checkDB());
-                    } else {
-                      setError(data.err);
-                    }
+          {admin && (
+            <div id="editItemActions">
+              <button
+                className="interaction-btn"
+                onClick={() => {
+                  setShowMove(true);
+                }}
+              >
+                <img src={MoveIcon} alt="" />
+              </button>
+              <button
+                className="interaction-btn"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  if (name.length < 1) {
+                    return setError("Name is required");
+                  }
+                  let data = new FormData();
+                  data.append("name", name);
+                  if (!file) {
+                    data.append("removePhoto", "true");
+                  } else if (file !== "old") {
+                    data.append("photo", file);
+                  }
+                  console.log("data", data);
+                  await fetch(`http://localhost:3000/api/v1/items/${id}`, {
+                    method: "PATCH",
+                    body: data,
                   })
-                  .catch((err) => console.log(err));
-              }}
-            >
-              SAVE
-            </button>
-          </div>
+                    .then((data) => data.json())
+                    .then((data) => {
+                      console.log(data);
+                      if (data.success === true) {
+                        setError(false);
+                        dispatch(checkDB());
+                      } else {
+                        setError(data.err);
+                      }
+                    })
+                    .catch((err) => console.log(err));
+                }}
+              >
+                SAVE
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </>

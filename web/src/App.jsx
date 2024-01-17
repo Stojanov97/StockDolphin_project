@@ -13,10 +13,12 @@ import "./Styles/App.css";
 import SignInPage from "./Pages/SignInOptions/SignInPage";
 import PasswordReset from "./Pages/SignInOptions/PasswordReset";
 import MainLayout from "./Pages/MainLayout";
-import Dashboard from "./Components/Dashboard";
-import CategoryInventory from "./Components/CategoryInventory";
-import ItemInventory from "./Components/ItemInventory";
-import OrderInventory from "./Components/OrderInventory";
+import Dashboard from "./Pages/Dashboard";
+import CategoryInventory from "./Pages/Inventory/Categories";
+import ItemInventory from "./Pages/Inventory/Items";
+import OrderInventory from "./Pages/Inventory/Orders";
+import Reports from "./Pages/Reports";
+import Loading from "./Components/Loading";
 
 const themes = {
   light: `${__dirname}../light.css`,
@@ -33,6 +35,7 @@ function App() {
   const [orders, setOrders] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [invoices, setInvoices] = useState([]);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     (async () => {
       const cookieString = document.cookie;
@@ -74,6 +77,7 @@ function App() {
   useEffect(() => {
     if (logged) {
       console.log("fetching");
+      setLoading(true);
       (async () => {
         await fetch("http://localhost:3000/api/v1/categories")
           .then((data) => data.json())
@@ -95,6 +99,7 @@ function App() {
           .then((data) => data.json())
           .then((data) => setInvoices(data))
           .catch((err) => console.log(err));
+        setLoading(false);
       })();
     }
   }, [logged, useSelector((state) => state.checkDB.value)]);
@@ -116,14 +121,21 @@ function App() {
     >
       <div className="App">
         {logged ? (
-          <MainLayout>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/inventory" element={<CategoryInventory />} />
-              <Route path="/inventory/:id" element={<ItemInventory />} />
-              <Route path="/inventory/item/:id" element={<OrderInventory />} />
-            </Routes>
-          </MainLayout>
+          <>
+            {loading && <Loading />}
+            <MainLayout>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/inventory" element={<CategoryInventory />} />
+                <Route path="/inventory/:id" element={<ItemInventory />} />
+                <Route
+                  path="/inventory/item/:id"
+                  element={<OrderInventory />}
+                />
+                <Route path="/reports" element={<Reports />} />
+              </Routes>
+            </MainLayout>
+          </>
         ) : (
           <Routes>
             <Route path="/" element={<SignInPage />} />

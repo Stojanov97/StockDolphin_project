@@ -16,7 +16,7 @@
 }
 
 #editItemName {
-  width: 100%;
+  width: 360px;
   background-color: transparent;
   border: 1px solid var(--primary-text);
   border-radius: 10px;
@@ -53,10 +53,10 @@
 }
 
 #editItemActions {
-  width: 100%;
+  width: 360px;
   margin-top: 60px;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
 }
 

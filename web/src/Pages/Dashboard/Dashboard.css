@@ -1,9 +1,3 @@
-h1 {
-  font-size: 38px;
-  font-weight: 400;
-  cursor: pointer;
-}
-
 .greeting {
   display: flex;
   align-items: center;

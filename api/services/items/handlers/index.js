@@ -125,7 +125,7 @@ const updateHandler = async (req, res) => {
     await validate(data, ItemUpdate);
     let item = await readByID(id);
     req.files && updateFile(req.files.photo, "item", id);
-    if (!req.files) {
+    if (req.body.removePhoto === "true") {
       await removeFile("item", id);
     }
     await update(id, data);
@@ -150,7 +150,7 @@ const moveHandler = async (req, res) => {
     if (admin === false) throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
     let data = {
-      category: { id: req.body.category, name: req.body.categoryName },
+      ...req.body,
       By: { id: userID, name: username },
     };
     await validate(data, ItemMove);
@@ -161,7 +161,7 @@ const moveHandler = async (req, res) => {
       action: "moved",
       what: "item",
       item: { id: id, name: item.name },
-      in: item.category,
+      in: req.body.category,
     });
     ////
     // await activity.create({
