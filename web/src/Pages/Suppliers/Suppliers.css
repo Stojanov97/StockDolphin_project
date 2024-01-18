@@ -1,0 +1,11 @@
+#suppliers-workspace {
+  margin: 10px 0 30px 0;
+}
+#supplierContainer {
+  height: 750px;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 85px;
+  overflow: scroll;
+}

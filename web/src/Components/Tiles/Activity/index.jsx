@@ -1,7 +1,7 @@
 import React from "react";
 import "./ActivityTile.css";
 
-const ActivityTile = ({ by, action, item, what, cat }) => {
+const ActivityTile = ({ by, action, item, what, cat, updatedAt }) => {
   return (
     <div className="activity-tile">
       <p className={action === "deleted" ? "faded" : "classic"}>
@@ -21,6 +21,7 @@ const ActivityTile = ({ by, action, item, what, cat }) => {
           </>
         )}
       </p>
+      {updatedAt && <p>{new Date(updatedAt).toLocaleString()}</p>}
     </div>
   );
 };

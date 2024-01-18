@@ -1,0 +1,59 @@
+#activity-workspace {
+  margin: 40px 0 0 0;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+}
+
+#activity-workspace > div:nth-child(1) {
+  display: flex;
+  flex-direction: column;
+}
+
+#activityContainer {
+  height: 820px;
+  overflow: scroll;
+}
+
+#sortIcon {
+  width: 40px;
+  aspect-ratio: 1/1;
+  align-self: flex-end;
+  cursor: pointer;
+  margin: 0 10px 10px 0;
+}
+
+#sortOptions {
+  width: 350px;
+  justify-self: end;
+  border-radius: 10px;
+  background-color: var(--third-color);
+  box-shadow: rgba(0, 0, 0, 0.24) 7px 5px 5px;
+  height: 450px;
+}
+#sortOptions > h1 {
+  padding: 10px;
+  font-size: 30px;
+  color: var(--primary-text);
+}
+
+#filterOptionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 20px 0 0 30px;
+}
+
+#filterOptionsContainer > label {
+  color: var(--primary-text);
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 20px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+#filterOptionsContainer > label > input[type="radio"] {
+  accent-color: green;
+  width: 30px;
+}

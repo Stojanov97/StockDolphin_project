@@ -33,7 +33,6 @@ const InvoiceSchema = new mongoose.Schema({
       ref: "category",
     },
   },
-
   total: {
     type: Number,
     required: true,
@@ -59,7 +58,16 @@ const read = async () => {
   }
 };
 
+const move = async (id, data) => {
+  try {
+    return await invoice.updateMany({ "item.id": id }, data);
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   create,
   read,
+  move,
 };

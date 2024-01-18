@@ -8,6 +8,8 @@ const {
   remove,
 } = require("../../../pkg/items");
 const activity = require("../../../pkg/activity");
+const { move } = require("../../../pkg/invoices");
+const { InvoiceMove } = require("../../../pkg/invoices/validate");
 const {
   ItemCreate,
   ItemUpdate,
@@ -155,6 +157,8 @@ const moveHandler = async (req, res) => {
     };
     await validate(data, ItemMove);
     await update(id, data);
+    await validate(req.body, InvoiceMove);
+    await move(id, data);
     let item = await readByID(id); //
     await activity.create({
       By: { name: username, id: userID },

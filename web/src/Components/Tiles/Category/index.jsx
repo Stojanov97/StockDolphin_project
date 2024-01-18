@@ -16,7 +16,6 @@ const CategoryTile = ({ id, name, updated }) => {
   );
   const [deleteStat, setDeleteStat] = useState(false);
   let date = new Date(updated);
-
   return (
     <>
       {deleteStat && (
@@ -55,6 +54,7 @@ const CategoryTile = ({ id, name, updated }) => {
                 <Currency
                   currency="EUR"
                   quantity={invoices.reduce((acc, curr) => acc + curr.total, 0)}
+                  // quantity={amount}
                   pattern="! ###,##0.00 "
                   decimal=","
                   group="."

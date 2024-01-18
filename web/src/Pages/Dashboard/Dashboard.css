@@ -36,6 +36,11 @@
   position: relative;
 }
 
+#activityListContainer {
+  height: 210px;
+  overflow: scroll;
+}
+
 #recentOrders {
   width: 100%;
   position: relative;
@@ -44,10 +49,9 @@
 #activityList {
   padding: 10px;
   width: 100%;
-  height: 200px;
+  /* height: 200px; */
   display: flex;
   flex-direction: column;
-  overflow: scroll;
   gap: 10px;
 }
 

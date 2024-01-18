@@ -106,22 +106,24 @@ const Dashboard = () => {
         </div>
         <div id="recentActivity">
           <h1 className="section-title">Recent Activity</h1>
-          {activities.length > 0 ? (
-            <div id="activityList">
-              {activities.map(({ _id, By, action, item, what, in: t }) => (
-                <ActivityTile
-                  key={_id}
-                  by={By.name}
-                  what={what}
-                  action={action}
-                  item={item.name}
-                  cat={t.name}
-                />
-              ))}
-            </div>
-          ) : (
-            <h1 className="na">No recent activities</h1>
-          )}
+          <div id="activityListContainer">
+            {activities.length > 0 ? (
+              <div id="activityList">
+                {activities.map(({ _id, By, action, item, what, in: t }) => (
+                  <ActivityTile
+                    key={_id}
+                    by={By.name}
+                    what={what}
+                    action={action}
+                    item={item.name}
+                    cat={t.name}
+                  />
+                ))}
+              </div>
+            ) : (
+              <h1 className="na">No recent activities</h1>
+            )}
+          </div>
         </div>
         <div id="recentOrders">
           <h1 className="section-title">Recent Orders</h1>

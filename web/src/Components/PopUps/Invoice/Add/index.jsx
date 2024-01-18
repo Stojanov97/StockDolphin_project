@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Currency from "react-currency-formatter";
 import DiscardPopUp from "../../DiscardPopUp";
 import CloseIcon from "../../../../Images/Close.png";
 import { checkDB } from "../../../../Slices/CheckForDBUpdatesSlice";
@@ -62,7 +61,7 @@ const AddInvoicePopUp = ({ close, item, orders }) => {
       ...provided,
       maxHeight: "330px",
       overflow: "scroll",
-      backgroundColor: "transparent",
+      backgroundColor: "var(--background)",
       width: "520px",
     }),
     valueContainer: (provided, state) => ({
@@ -135,33 +134,6 @@ const AddInvoicePopUp = ({ close, item, orders }) => {
             options={supplierOptions}
             styles={customStyles}
           />
-          {/* {suppliers.length > 0 ? (
-            <select
-              name="suppliers"
-              id="suppliers"
-              onChange={(e) => {
-                setSupplier(JSON.parse(e.target.value));
-              }}
-            >
-              {suppliers.map(({ _id, name }, index) => (
-                <>
-                  {index === 0 && (
-                    <option key={index} value={false} selected>
-                      Supplier*
-                    </option>
-                  )}
-                  <option
-                    key={_id}
-                    value={JSON.stringify({ name: name, id: _id })}
-                  >
-                    {name}
-                  </option>
-                </>
-              ))}
-            </select>
-          ) : (
-            <h2 className="na">No suppliers available</h2>
-          )} */}
           <input
             type="date"
             name="date"
@@ -234,7 +206,7 @@ const AddInvoicePopUp = ({ close, item, orders }) => {
                   date: date,
                   orders: ordersMapped,
                   item: { name: item.name, id: item._id },
-                  category: item.category,
+                  category: { name: item.category.name, id: item.category.id },
                   total: ordersMapped.reduce(
                     (acc, curr) => acc + curr.price,
                     0

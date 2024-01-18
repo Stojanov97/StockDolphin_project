@@ -8,6 +8,11 @@ const InvoiceCreate = {
   total: "required|decimal",
 };
 
+const InvoiceMove = {
+  category: "required|object",
+};
+
 module.exports = {
   InvoiceCreate,
+  InvoiceMove,
 };

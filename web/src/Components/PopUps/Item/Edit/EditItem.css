@@ -27,6 +27,7 @@
 
 #editItemName > label {
   font-size: 28px;
+  color: var(--primary-text);
 }
 
 #editItemName > input {

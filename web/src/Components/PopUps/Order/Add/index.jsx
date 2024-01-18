@@ -114,32 +114,39 @@ const AddOrderPopUp = ({ close, item }) => {
               e.preventDefault();
               if (!supplier) {
                 return setError("Please select a supplier");
-              }
-              await fetch("http://localhost:3000/api/v1/orders", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  supplier: supplier,
-                  quantity: quantity,
-                  price: totalPrice,
-                  date: date,
-                  category: item.category,
-                  item: { name: item.name, id: item._id },
-                }),
-              })
-                .then((data) => data.json())
-                .then((data) => {
-                  if (data.success === true) {
-                    setError(false);
-                    dispatch(checkDB());
-                    close();
-                  } else {
-                    setError(data.err);
-                  }
+              } else if (!quantity) {
+                return setError("Please provide an amount");
+              } else if (!totalPrice) {
+                return setError("Please provide a total price");
+              } else if (!date) {
+                return setError("Please select a date");
+              } else {
+                await fetch("http://localhost:3000/api/v1/orders", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    supplier: supplier,
+                    quantity: quantity,
+                    price: totalPrice,
+                    date: date,
+                    category: item.category,
+                    item: { name: item.name, id: item._id },
+                  }),
                 })
-                .catch((err) => console.log(err));
+                  .then((data) => data.json())
+                  .then((data) => {
+                    if (data.success === true) {
+                      setError(false);
+                      dispatch(checkDB());
+                      close();
+                    } else {
+                      setError(data.err);
+                    }
+                  })
+                  .catch((err) => console.log(err));
+              }
             }}
           >
             ADD ORDER

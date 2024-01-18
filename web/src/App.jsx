@@ -19,6 +19,9 @@ import ItemInventory from "./Pages/Inventory/Items";
 import OrderInventory from "./Pages/Inventory/Orders";
 import Reports from "./Pages/Reports";
 import Loading from "./Components/Loading";
+import ReportsActivity from "./Pages/Reports/Activity";
+import ReportsSummary from "./Pages/Reports/Summary";
+import Suppliers from "./Pages/Suppliers";
 
 const themes = {
   light: `${__dirname}../light.css`,
@@ -133,6 +136,9 @@ function App() {
                   element={<OrderInventory />}
                 />
                 <Route path="/reports" element={<Reports />} />
+                <Route path="/reports/activity" element={<ReportsActivity />} />
+                <Route path="/reports/summary" element={<ReportsSummary />} />
+                <Route path="/suppliers" element={<Suppliers />} />
               </Routes>
             </MainLayout>
           </>
