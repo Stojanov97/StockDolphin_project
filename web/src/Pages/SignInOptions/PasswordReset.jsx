@@ -74,7 +74,7 @@ const PasswordReset = () => {
             onClick={(e) => {
               e.preventDefault();
               (async () => {
-                await fetch(`http://localhost:3000/api/v1/auth/${id}`, {
+                await fetch(`/api/v1/auth/${id}`, {
                   method: "PATCH",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({

@@ -4,6 +4,8 @@ import CloseIcon from "../../../../Images/Close.png";
 import DiscardPopUp from "../../DiscardPopUp";
 import { useDispatch } from "react-redux";
 import { checkDB } from "../../../../Slices/CheckForDBUpdatesSlice";
+import { sliceLoading } from "../../../../Slices/LoadingSlice";
+import socket from "../../../../socket";
 
 const AddSupplier = ({ close }) => {
   const dispatch = useDispatch();
@@ -92,7 +94,9 @@ const AddSupplier = ({ close }) => {
                   return setErr("Email is required");
                 } else {
                   setErr(false);
-                  fetch("http://localhost:3000/api/v1/suppliers", {
+                  close();
+                  dispatch(sliceLoading(true))
+                  fetch("/api/v1/suppliers", {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
@@ -108,7 +112,7 @@ const AddSupplier = ({ close }) => {
                     .then((data) => {
                       if (data.success === true) {
                         dispatch(checkDB());
-                        close();
+                        socket.emit("upis")
                       } else {
                         setErr(data.err);
                       }

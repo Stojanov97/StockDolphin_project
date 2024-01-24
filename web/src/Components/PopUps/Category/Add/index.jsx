@@ -5,6 +5,8 @@ import "./AddCategoryPopUp.css";
 import CloseIcon from "../../../../Images/Close.png";
 import FileUploadIcon from "../../../../Images/AddImage.png";
 import DiscardPopUp from "../../DiscardPopUp";
+import { sliceLoading } from "../../../../Slices/LoadingSlice";
+import socket from "../../../../socket"
 
 const AddCategoryPopUp = ({ close }) => {
   const dispatch = useDispatch();
@@ -107,27 +109,30 @@ const AddCategoryPopUp = ({ close }) => {
               e.preventDefault();
               if (name.length < 1) {
                 return setError("Name is required");
-              }
-              let data = new FormData();
-              data.append("name", name);
-              if (file) data.append("photo", file);
-              console.log(data);
-              await fetch("http://localhost:3000/api/v1/categories", {
-                method: "POST",
-                body: data,
-              })
+              }else{
+                close();
+                dispatch(sliceLoading(true))
+                let data = new FormData();
+                data.append("name", name);
+                if (file) data.append("photo", file);
+                console.log(data);
+                await fetch("/api/v1/categories", {
+                  method: "POST",
+                  body: data,
+                })
                 .then((data) => data.json())
                 .then((data) => {
                   if (data.success === true) {
                     setError(false);
                     dispatch(checkDB());
-                    close();
+                    socket.emit("upis")
                   } else {
                     setError(data.err);
                   }
                 })
                 .catch((err) => console.log(err));
-            }}
+              }}
+            }
           >
             ADD CATEGORY
           </button>

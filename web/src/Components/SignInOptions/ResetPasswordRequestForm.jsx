@@ -48,7 +48,7 @@ const ResetPasswordRequestForm = () => {
           onClick={(e) => {
             e.preventDefault();
             (async () => {
-              await fetch("http://localhost:3000/api/v1/auth/", {
+              await fetch("/api/v1/auth/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: email }),

@@ -8,6 +8,7 @@ const {
   updateHandler,
   moveHandler,
   deleteHandler,
+  deleteByCategoryHandler,
   readActivityHandler,
   readByCategoryHandler,
   getImage,
@@ -51,6 +52,7 @@ service.post("/api/v1/items", createHandler);
 service.patch("/api/v1/items/:id", updateHandler);
 service.patch("/api/v1/items/move/:id", moveHandler);
 service.delete("/api/v1/items/:id", deleteHandler);
+service.delete("/api/v1/items/cat/:id", deleteByCategoryHandler);
 
 service.listen(port, (err) =>
   err ? console.log(err) : console.log("Items service started successfully")

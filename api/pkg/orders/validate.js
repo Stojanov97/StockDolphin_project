@@ -8,15 +8,6 @@ const OrderCreate = {
   By: "required|object",
 };
 
-const OrderUpdate = {
-  supplier: "object",
-  price: "decimal",
-  quantity: "decimal",
-  date: "date",
-  By: "object",
-};
-
 module.exports = {
   OrderCreate,
-  OrderUpdate,
 };

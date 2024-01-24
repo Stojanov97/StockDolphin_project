@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../../Images/ITL-logo.png";
 import dashboard from "../../Images/Dashboard.png";
 import inventory from "../../Images/Inventory.png";
@@ -12,11 +12,20 @@ import { toggle } from "../../Slices/ThemeSlice";
 import { check } from "../../Slices/CheckTokenSlice";
 import { checkDB } from "../../Slices/CheckForDBUpdatesSlice";
 import { useNavigate } from "react-router-dom";
+import { sliceLoading } from "../../Slices/LoadingSlice";
+import socket from "../../socket"
+import RefreshAlert from "../../Components/RefreshAlert";
 
 const MainLayout = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [showRefresh, setShowRefresh] = useState(false);
   const selectedTheme = useSelector((state) => state.theme.value);
+  useEffect(()=>{
+    socket.on("refresh",()=>{
+      setShowRefresh(true)
+    })
+  },[socket])
 
   const { switcher, themes } = useThemeSwitcher();
   useEffect(() => {
@@ -24,6 +33,7 @@ const MainLayout = ({ children }) => {
   }, [selectedTheme]);
   return (
     <main>
+      {showRefresh && <RefreshAlert close={()=>{setShowRefresh(false)}}/>}
       <nav>
         <div className="links">
           <img
@@ -31,7 +41,9 @@ const MainLayout = ({ children }) => {
             alt="ITL logo"
             className="logo btn"
             onClick={() => {
+              // socket.emit("upis")
               dispatch(check());
+              dispatch(sliceLoading(true))
               dispatch(checkDB());
               navigate("/");
             }}
@@ -40,6 +52,7 @@ const MainLayout = ({ children }) => {
             className="nav-btn"
             onClick={() => {
               dispatch(check());
+              dispatch(sliceLoading(true))
               dispatch(checkDB());
               navigate("/");
             }}
@@ -51,6 +64,7 @@ const MainLayout = ({ children }) => {
             className="nav-btn"
             onClick={() => {
               dispatch(check());
+              dispatch(sliceLoading(true))
               dispatch(checkDB());
               navigate("/inventory");
             }}
@@ -62,7 +76,8 @@ const MainLayout = ({ children }) => {
             className="nav-btn"
             onClick={() => {
               dispatch(check());
-              dispatch(checkDB());
+              // dispatch(sliceLoading(true))
+              // dispatch(checkDB());
               navigate("/reports");
             }}
           >
@@ -74,6 +89,7 @@ const MainLayout = ({ children }) => {
             id="supplier-btn"
             onClick={() => {
               dispatch(check());
+              dispatch(sliceLoading(true))
               dispatch(checkDB());
               navigate("/suppliers");
             }}
@@ -93,7 +109,7 @@ const MainLayout = ({ children }) => {
         <button
           className="nav-btn"
           onClick={async () => {
-            await fetch("http://localhost:3000/api/v1/auth", {
+            await fetch("/api/v1/auth", {
               method: "DELETE",
             });
             dispatch(check());

@@ -25,11 +25,11 @@ const Dashboard = () => {
   const [activities, setActivities] = useState([]);
   const [orders, setOrders] = useState([]);
   useEffect(() => {
-    fetch("http://localhost:3000/api/v1/items/recent")
+    fetch("/api/v1/items/recent")
       .then((data) => data.json())
       .then((data) => setActivities(data))
       .catch((err) => console.log(err));
-    fetch("http://localhost:3000/api/v1/orders/recent")
+    fetch("/api/v1/orders/recent")
       .then((data) => data.json())
       .then((data) => setOrders(data))
       .catch((err) => console.log(err));
@@ -109,16 +109,22 @@ const Dashboard = () => {
           <div id="activityListContainer">
             {activities.length > 0 ? (
               <div id="activityList">
-                {activities.map(({ _id, By, action, item, what, in: t }) => (
-                  <ActivityTile
-                    key={_id}
-                    by={By.name}
-                    what={what}
-                    action={action}
-                    item={item.name}
-                    cat={t.name}
-                  />
-                ))}
+                {activities
+                  .sort(
+                    (a, b) =>
+                      Number(new Date(b.updatedAt)) -
+                      Number(new Date(a.updatedAt))
+                  )
+                  .map(({ _id, By, action, item, what, in: t }) => (
+                    <ActivityTile
+                      key={_id}
+                      by={By.name}
+                      what={what}
+                      action={action}
+                      item={item.name}
+                      cat={t.name}
+                    />
+                  ))}
               </div>
             ) : (
               <h1 className="na">No recent activities</h1>

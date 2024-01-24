@@ -5,6 +5,8 @@ import CloseIcon from "../../../../Images/Close.png";
 import { checkDB } from "../../../../Slices/CheckForDBUpdatesSlice";
 import "./InvoicePopUp.css";
 import Select from "react-select";
+import { sliceLoading } from "../../../../Slices/LoadingSlice";
+import socket from "../../../../socket"
 
 const AddInvoicePopUp = ({ close, item, orders }) => {
   const dispatch = useDispatch();
@@ -127,7 +129,7 @@ const AddInvoicePopUp = ({ close, item, orders }) => {
             }}
           />
           <Select
-            id="orders"
+            id="suppliers"
             placeholder="Supplier*"
             value={supplier}
             onChange={setSupplier}
@@ -192,7 +194,9 @@ const AddInvoicePopUp = ({ close, item, orders }) => {
               if (!selectedOrders.length > 0) {
                 return setError("Please select orders");
               }
-              await fetch("http://localhost:3000/api/v1/invoices", {
+              close();
+              dispatch(sliceLoading(true));
+              await fetch("/api/v1/invoices", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -218,7 +222,7 @@ const AddInvoicePopUp = ({ close, item, orders }) => {
                   if (data.success === true) {
                     setError(false);
                     dispatch(checkDB());
-                    close();
+                    socket.emit("upis")
                   } else {
                     setError(data.err);
                   }

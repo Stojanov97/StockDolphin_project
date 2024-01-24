@@ -10,6 +10,7 @@ import orders from "../Slices/OrdersSlice";
 import suppliers from "../Slices/SuppliersSlice";
 import invoices from "../Slices/InvoicesSlice";
 import checkDB from "../Slices/CheckForDBUpdatesSlice";
+import loading from "../Slices/LoadingSlice";
 
 const rootReducer = combineReducers({
   theme,
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   suppliers,
   invoices,
   checkDB,
+  loading,
 });
 
 export default rootReducer;

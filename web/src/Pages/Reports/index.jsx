@@ -3,15 +3,20 @@ import { useNavigate } from "react-router-dom";
 import "./Reports.css";
 import ActivityIcon from "../../Images/Activity.png";
 import InventoryIcon from "../../Images/Inventory.png";
+import { useDispatch } from "react-redux";
+import { checkDB } from "../../Slices/CheckForDBUpdatesSlice";
+import { sliceLoading } from "../../Slices/LoadingSlice";
 
 const Reports = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
   return (
     <section>
       <div className="breadcrumb">
         <h1
           onClick={() => {
-            window.location.reload(false);
+            dispatch(sliceLoading(true))
+            dispatch(checkDB());
           }}
         >
           Reports
@@ -23,6 +28,8 @@ const Reports = () => {
           className="report-option"
           onClick={() => {
             navigate("/reports/activity");
+            dispatch(sliceLoading(true))
+            dispatch(checkDB());
           }}
         >
           <div className="report-title">
@@ -39,6 +46,8 @@ const Reports = () => {
           className="report-option"
           onClick={() => {
             navigate("/reports/summary");
+            dispatch(sliceLoading(true))
+            dispatch(checkDB());
           }}
         >
           <div className="report-title">

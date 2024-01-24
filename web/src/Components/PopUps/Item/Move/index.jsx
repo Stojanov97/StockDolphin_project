@@ -5,6 +5,8 @@ import CloseIcon from "../../../../Images/Close.png";
 import CategoryFolderIcon from "../../../../Images/CategoryFolder.png";
 import DiscardPopUp from "../../DiscardPopUp";
 import { checkDB } from "../../../../Slices/CheckForDBUpdatesSlice";
+import { sliceLoading } from "../../../../Slices/LoadingSlice";
+import socket from "../../../../socket";
 
 const MoveItemPopUp = ({ close, id }) => {
   const dispatch = useDispatch();
@@ -74,7 +76,9 @@ const MoveItemPopUp = ({ close, id }) => {
                 if (!moveTo) {
                   setErr("Please select a category");
                 } else {
-                  await fetch(`http://localhost:3000/api/v1/items/move/${id}`, {
+                  close();
+                  dispatch(sliceLoading(true))
+                  await fetch(`/api/v1/items/move/${id}`, {
                     method: "PATCH",
                     headers: {
                       "Content-Type": "application/json",
@@ -88,7 +92,7 @@ const MoveItemPopUp = ({ close, id }) => {
                       if (data.success == true) {
                         setErr(false);
                         dispatch(checkDB());
-                        close();
+                        socket.emit("upis")
                       } else {
                         setErr(data.err);
                       }

@@ -1,3 +1,4 @@
+const config = require("../../../pkg/config").get;
 const {
   create,
   read,
@@ -7,8 +8,6 @@ const {
   remove,
 } = require("../../../pkg/categories");
 const activity = require("../../../pkg/activity");
-const { removeByCategory } = require("../../../pkg/items");
-const { removeByCategory: removeOrders } = require("../../../pkg/orders");
 const pathModule = require("path");
 const {
   CategoryCreate,
@@ -32,7 +31,6 @@ const createHandler = async (req, res) => {
       ...{ By: { name: username, id: id } },
     };
     await validate(data, CategoryCreate);
-    // console.log(req);
     let category = await create(data);
     req.files && upload(req.files.photo, "cat", category._id);
     await activity.create({
@@ -53,15 +51,6 @@ const createHandler = async (req, res) => {
 const readHandler = async (req, res) => {
   try {
     let categories = await read();
-    // let photos = await downloadAll("cat");
-    // categories = categories.map((cat) => {
-    //   return {
-    //     ...cat._doc,
-    //     ...{
-    //       photo: photos.find(({ id }) => id == cat._doc._id) || false,
-    //     },
-    //   };
-    // });
     return await res.json(categories);
   } catch (err) {
     return res
@@ -74,15 +63,6 @@ const readByUserHandler = async (req, res) => {
   try {
     const { id } = req.auth;
     let categories = await readByUserID(id);
-    let photos = await downloadAll("cat");
-    categories = categories.map((cat) => {
-      return {
-        ...cat._doc,
-        ...{
-          photo: photos.find(({ id }) => id == cat._doc._id) || false,
-        },
-      };
-    });
     return res.json(categories);
   } catch (err) {
     return res
@@ -130,8 +110,20 @@ const deleteHandler = async (req, res) => {
     let category = await readByID(id);
     await remove(id);
     await removeFile("cat", id);
-    await removeByCategory(id);
-    await removeOrders(id);
+    await fetch(`http://127.0.0.1:${config("APP_PORT")}/api/v1/items/cat/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Cookie":`token=${req.cookies.token}`
+      },
+    })
+    await fetch(`http://127.0.0.1:${config("APP_PORT")}/api/v1/orders/cat/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Cookie":`token=${req.cookies.token}`
+      },
+    })
     await activity.create({
       By: { name: username, id: userID },
       action: "deleted",

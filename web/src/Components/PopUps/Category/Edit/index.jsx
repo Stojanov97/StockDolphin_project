@@ -6,15 +6,15 @@ import "../Add/AddCategoryPopUp.css";
 import CloseIcon from "../../../../Images/Close.png";
 import FileUploadIcon from "../../../../Images/AddImage.png";
 import DiscardPopUp from "../../DiscardPopUp";
+import { sliceLoading } from "../../../../Slices/LoadingSlice";
+import socket from "../../../../socket"
 
 const EditCategoryPopUp = ({ close, name: categoryName }) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [name, setName] = useState(categoryName);
-  const [image, setImage] = useState(
-    `http://localhost:3000/api/v1/categories/image/${id}`
-  );
-  let startImage = `http://localhost:3000/api/v1/categories/image/${id}`;
+  const [image, setImage] = useState(`/api/v1/categories/image/${id}`);
+  let startImage = `/api/v1/categories/image/${id}`;
   const [file, setFile] = useState("old");
   const [showDiscard, setShowDiscard] = useState(false);
   const [error, setError] = useState(false);
@@ -81,7 +81,6 @@ const EditCategoryPopUp = ({ close, name: categoryName }) => {
             type="file"
             id="fileUpload"
             name="fileUpload"
-            // value={`http://localhost:3000/api/v1/items/image/${id}`}
             accept=".jpg, .jpeg"
             onClick={(e) => {
               if (image) {
@@ -123,7 +122,9 @@ const EditCategoryPopUp = ({ close, name: categoryName }) => {
               } else if (file !== "old") {
                 data.append("photo", file);
               }
-              await fetch(`http://localhost:3000/api/v1/categories/${id}`, {
+              close();
+              dispatch(sliceLoading(true));
+              await fetch(`/api/v1/categories/${id}`, {
                 method: "PATCH",
                 body: data,
               })
@@ -133,7 +134,7 @@ const EditCategoryPopUp = ({ close, name: categoryName }) => {
                   if (data.success === true) {
                     setError(false);
                     dispatch(checkDB());
-                    close();
+                    socket.emit("upis")
                   } else {
                     setError(data.err);
                   }

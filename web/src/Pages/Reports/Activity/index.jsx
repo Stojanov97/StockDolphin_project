@@ -10,7 +10,7 @@ const ReportsActivity = () => {
   const [sort, setSort] = useState(false);
   const [filter, setFilter] = useState(false);
   useEffect(() => {
-    fetch("http://localhost:3000/api/v1/items/recent")
+    fetch("/api/v1/items/recent")
       .then((data) => data.json())
       .then((data) => setActivities(data))
       .catch((err) => console.log(err));

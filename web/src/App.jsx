@@ -22,6 +22,7 @@ import Loading from "./Components/Loading";
 import ReportsActivity from "./Pages/Reports/Activity";
 import ReportsSummary from "./Pages/Reports/Summary";
 import Suppliers from "./Pages/Suppliers";
+import { sliceLoading } from "./Slices/LoadingSlice";
 
 const themes = {
   light: `${__dirname}../light.css`,
@@ -38,7 +39,7 @@ function App() {
   const [orders, setOrders] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [invoices, setInvoices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const loading = useSelector((state) => state.loading.value);
   useEffect(() => {
     (async () => {
       const cookieString = document.cookie;
@@ -51,7 +52,7 @@ function App() {
           return setLogged(true);
         }
       }
-      return fetch("http://localhost:3000/api/v1/auth/refreshToken", {
+      return fetch("/api/v1/auth/refreshToken", {
         method: "POST",
       })
         .then((data) => data.json())
@@ -79,30 +80,28 @@ function App() {
 
   useEffect(() => {
     if (logged) {
-      console.log("fetching");
-      setLoading(true);
       (async () => {
-        await fetch("http://localhost:3000/api/v1/categories")
+        await fetch("/api/v1/categories")
           .then((data) => data.json())
           .then((data) => setCategories(data))
           .catch((err) => console.log(err));
-        await fetch("http://localhost:3000/api/v1/items")
+        await fetch("/api/v1/items")
           .then((data) => data.json())
           .then((data) => setItems(data))
           .catch((err) => console.log(err));
-        await fetch("http://localhost:3000/api/v1/orders")
+        await fetch("/api/v1/orders")
           .then((data) => data.json())
           .then((data) => setOrders(data))
           .catch((err) => console.log(err));
-        await fetch("http://localhost:3000/api/v1/suppliers")
+        await fetch("/api/v1/suppliers")
           .then((data) => data.json())
           .then((data) => setSuppliers(data))
           .catch((err) => console.log(err));
-        await fetch("http://localhost:3000/api/v1/invoices")
+        await fetch("/api/v1/invoices")
           .then((data) => data.json())
           .then((data) => setInvoices(data))
           .catch((err) => console.log(err));
-        setLoading(false);
+        dispatch(sliceLoading(false))
       })();
     }
   }, [logged, useSelector((state) => state.checkDB.value)]);

@@ -9,6 +9,8 @@ const {
   recentOrdersHandler,
   getLength,
   getValue,
+  deleteByItemHandler,
+  deleteByCategoryHandler
 } = require("./handlers");
 
 const cookieParser = require("cookie-parser");
@@ -40,7 +42,8 @@ service.get("/api/v1/orders/length", getLength);
 service.get("/api/v1/orders/total", getValue);
 service.get("/api/v1/orders/:item", readByItemHandler);
 service.post("/api/v1/orders", createHandler);
-service.patch("/api/v1/orders/:id", updateHandler);
+service.delete("/api/v1/orders/cat/:id", deleteByCategoryHandler);
+service.delete("/api/v1/orders/item/:id", deleteByItemHandler);
 
 service.listen(port, (err) =>
   err ? console.log(err) : console.log("Orders service started successfully")

@@ -95,7 +95,7 @@ const Register = ({ tgHasAcc }) => {
         onClick={(e) => {
           e.preventDefault();
           (async () => {
-            await fetch("http://localhost:3000/api/v1/auth/register", {
+            await fetch("/api/v1/auth/register", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({

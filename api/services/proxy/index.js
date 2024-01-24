@@ -2,6 +2,8 @@ const path = require("path");
 const proxy = require("express-http-proxy");
 const express = require("express");
 const config = require("../../pkg/config").get;
+const app = express();
+const {Server} = require("socket.io");
 
 const allowCrossDomain = (req, res, next) => {
   res.header(`Access-Control-Allow-Origin`, `*`);
@@ -11,8 +13,22 @@ const allowCrossDomain = (req, res, next) => {
   next();
 };
 
-const app = express();
 app.use(allowCrossDomain);
+const server = require("http").createServer(app);
+
+const io = new Server(server,{
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  }
+})
+
+io.on("connection", (socket) => {
+  console.log("connected")
+  socket.on("upis",()=>{
+    socket.broadcast.emit("refresh")
+  })
+})
 
 app.use(
   "/api/v1/auth",
@@ -78,6 +94,6 @@ app.get("*", (req, res) => {
 });
 const PORT = config("APP_PORT") || 3000;
 
-app.listen(PORT, (err) =>
+server.listen(PORT, (err) =>
   err ? console.log(err) : console.log("Proxy started successfully")
 );

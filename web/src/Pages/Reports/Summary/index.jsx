@@ -10,10 +10,6 @@ import Select from "react-select";
 const ReportsSummary = () => {
   const navigate = useNavigate();
   let days = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-  const param = {
-    luminosity: "light",
-    hue: "green",
-  };
   let todayDate = new Date();
   let sevenDaysAgo = new Date(todayDate.getTime() - 7 * 24 * 60 * 60 * 1000);
   const categories = useSelector((state) => state.categories.value);
@@ -198,7 +194,10 @@ const ReportsSummary = () => {
               return {
                 label: cat.name,
                 data: test,
-                borderColor: randomColor(param),
+                borderColor: randomColor({
+                  hue: "green",
+                  seed: cat.name,
+                }),
               };
             }),
           }}

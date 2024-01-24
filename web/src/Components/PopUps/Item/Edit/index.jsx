@@ -9,6 +9,7 @@ import GreenEditIcon from "../../../../Images/EditGreen.png";
 import MoveIcon from "../../../../Images/MoveFolder.png";
 import DiscardPopUp from "../../DiscardPopUp";
 import MoveItemPopUp from "../Move";
+import socket from "../../../../socket";
 
 const EditItem = ({ id }) => {
   const dispatch = useDispatch();
@@ -16,9 +17,7 @@ const EditItem = ({ id }) => {
   const items = useSelector((state) => state.items.value);
   const [item, setItem] = useState(false);
   const [name, setName] = useState("");
-  const [image, setImage] = useState(
-    `http://localhost:3000/api/v1/items/image/${id}`
-  );
+  const [image, setImage] = useState(`/api/v1/items/image/${id}`);
   const [file, setFile] = useState("old");
   const [error, setError] = useState(false);
   const [showMove, setShowMove] = useState(false);
@@ -131,7 +130,7 @@ const EditItem = ({ id }) => {
                     data.append("photo", file);
                   }
                   console.log("data", data);
-                  await fetch(`http://localhost:3000/api/v1/items/${id}`, {
+                  await fetch(`/api/v1/items/${id}`, {
                     method: "PATCH",
                     body: data,
                   })
@@ -141,6 +140,7 @@ const EditItem = ({ id }) => {
                       if (data.success === true) {
                         setError(false);
                         dispatch(checkDB());
+                        socket.emit("upis")
                       } else {
                         setError(data.err);
                       }

@@ -5,11 +5,11 @@ const {
   readByItemID,
   update,
   readRecent,
+  removeByCategory,
+  removeByItem,
 } = require("../../../pkg/orders");
 const activity = require("../../../pkg/activity");
-const { readByID: itemByID } = require("../../../pkg/items");
-const { OrderCreate, OrderUpdate } = require("../../../pkg/orders/validate");
-const { downloadAll } = require("../../../pkg/files");
+const { OrderCreate} = require("../../../pkg/orders/validate");
 const { validate } = require("../../../pkg/validator");
 
 const createHandler = async (req, res) => {
@@ -61,46 +61,33 @@ const readByItemHandler = async (req, res) => {
   }
 };
 
-const updateHandler = async (req, res) => {
+const deleteByCategoryHandler = async (req, res) => {
   try {
-    const { admin, username, id: userID } = req.auth;
+    const {admin} = req.auth;
     if (admin === false) throw { code: 401, error: "You aren't an admin" };
     const { id } = req.params;
-    if (
-      req.body.item ||
-      req.body.itemName ||
-      req.body.categoryName ||
-      req.body.category
-    )
-      throw { code: 400, error: "You can't change the item" };
-    let data = {
-      supplier: {
-        name: req.body.supplierName,
-        id: req.body.supplier,
-      },
-      quantity: req.body.quantity,
-      price: req.body.price,
-      date: req.body.date,
-      By: { name: username, id: userID },
-    };
-    await validate(data, OrderUpdate);
-    await update(id, data);
-    let order = await readByID(id);
-    let item = await itemByID(order.item.id);
-    await activity.create({
-      By: { name: username, id: userID },
-      action: "edited",
-      what: "order",
-      item: { name: order.item.name, id: order.item.id },
-      in: item.category,
-    });
+    await removeByCategory(id);
     return await res.json({ success: true });
   } catch (err) {
     return res
       .status(err.code || 500)
       .json({ success: false, err: err.error || "Internal server error" });
   }
-};
+}
+
+const deleteByItemHandler = async (req, res) => {
+  try {
+    const {admin} = req.auth;
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
+    const { id } = req.params;
+    await removeByItem(id);
+    return await res.json({ success: true });
+  } catch (err) {
+    return res
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
+  }
+}
 
 const recentOrdersHandler = async (req, res) => {
   try {
@@ -139,8 +126,9 @@ module.exports = {
   createHandler,
   readHandler,
   readByItemHandler,
-  updateHandler,
   recentOrdersHandler,
   getLength,
   getValue,
+  deleteByCategoryHandler,
+  deleteByItemHandler
 };

@@ -4,6 +4,8 @@ import "../style.css";
 import DiscardPopUp from "../../DiscardPopUp";
 import { useDispatch } from "react-redux";
 import { checkDB } from "../../../../Slices/CheckForDBUpdatesSlice";
+import { sliceLoading } from "../../../../Slices/LoadingSlice";
+import socket from "../../../../socket";
 
 const SupplierEdit = ({ name, address, email, phone, id, close }) => {
   const dispatch = useDispatch();
@@ -85,7 +87,9 @@ const SupplierEdit = ({ name, address, email, phone, id, close }) => {
                 } else if (newPhone.length < 3) {
                   return setError("Phone must be at least 3 characters long");
                 } else {
-                  fetch(`http://localhost:3000/api/v1/suppliers/${id}`, {
+                  close();
+                  dispatch(sliceLoading(true))
+                  fetch(`/api/v1/suppliers/${id}`, {
                     method: "PATCH",
                     headers: {
                       "Content-Type": "application/json",
@@ -105,7 +109,7 @@ const SupplierEdit = ({ name, address, email, phone, id, close }) => {
                       if (data.success === true) {
                         setError(false);
                         dispatch(checkDB());
-                        close();
+                        socket.emit("upis")
                       } else {
                         setError(data.err);
                       }

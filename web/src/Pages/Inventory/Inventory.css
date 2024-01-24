@@ -64,7 +64,7 @@
   height: 580px;
   overflow: scroll;
   gap: 35px;
-  position: relative;
+  /* position: relative; */
   padding: 10px 10px;
 }
 

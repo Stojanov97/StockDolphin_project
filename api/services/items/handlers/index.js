@@ -1,3 +1,4 @@
+const config = require("../../../pkg/config").get;
 const {
   create,
   read,
@@ -6,10 +7,9 @@ const {
   readByCategory,
   update,
   remove,
+  removeByCategory
 } = require("../../../pkg/items");
 const activity = require("../../../pkg/activity");
-const { move } = require("../../../pkg/invoices");
-const { InvoiceMove } = require("../../../pkg/invoices/validate");
 const {
   ItemCreate,
   ItemUpdate,
@@ -23,7 +23,7 @@ const {
   removeFile,
   downloadByID,
 } = require("../../../pkg/files");
-const { removeByItem } = require("../../../pkg/orders");
+// const { removeByItem } = require("../../../pkg/orders");
 const pathModule = require("path");
 
 const createHandler = async (req, res) => {
@@ -56,15 +56,6 @@ const createHandler = async (req, res) => {
 const readHandler = async (req, res) => {
   try {
     let items = await read();
-    let photos = await downloadAll("item");
-    items = items.map((item) => {
-      return {
-        ...item._doc,
-        ...{
-          photo: photos.find(({ id }) => id == item._doc._id) || false,
-        },
-      };
-    });
     return await res.json(items);
   } catch (err) {
     return res
@@ -77,15 +68,7 @@ const readByUserHandler = async (req, res) => {
   try {
     const { id } = req.auth;
     let items = await readByUserID(id);
-    let photos = await downloadAll("item");
-    items = items.map((item) => {
-      return {
-        ...item._doc,
-        ...{
-          photo: photos.find(({ id }) => id == item._doc._id) || false,
-        },
-      };
-    });
+   
     return res.json(items);
   } catch (err) {
     return res
@@ -98,15 +81,6 @@ const readByCategoryHandler = async (req, res) => {
   try {
     const { id } = req.params;
     let items = await readByCategory(id);
-    // let photos = await downloadAll("item");
-    // items = items.map((item) => {
-    //   return {
-    //     ...item._doc,
-    //     ...{
-    //       photo: photos.find(({ id }) => id == item._doc._id) || false,
-    //     },
-    //   };
-    // });
     return res.json(items);
   } catch (err) {
     return res
@@ -157,8 +131,19 @@ const moveHandler = async (req, res) => {
     };
     await validate(data, ItemMove);
     await update(id, data);
-    await validate(req.body, InvoiceMove);
-    await move(id, data);
+    await fetch(
+      `http://127.0.0.1:${config(
+        "APP_PORT"
+      )}/api/v1/invoices/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Cookie": `token=${req.cookies.token}`,
+        },
+        body: JSON.stringify(req.body),
+      }
+    ).then((res) => res.json()).then((data) => console.log(data)).catch((err) => console.log(err));
     let item = await readByID(id); //
     await activity.create({
       By: { name: username, id: userID },
@@ -167,13 +152,6 @@ const moveHandler = async (req, res) => {
       item: { id: id, name: item.name },
       in: req.body.category,
     });
-    ////
-    // await activity.create({
-    //   By: { name: username, id: userID },
-    //   action: "created",
-    //   item: { id: item._id, name: item.name },
-    //   in: { id: req.body.category, name: req.body.categoryName },
-    // });
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -189,7 +167,14 @@ const deleteHandler = async (req, res) => {
     let item = await readByID(id);
     await remove(id);
     await removeFile("item", id);
-    await removeByItem(id);
+    // await removeByItem(id);
+    await fetch(`http://127.0.0.1:${config("APP_PORT")}/api/v1/orders/item/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Cookie": `token=${req.cookies.token}`,
+      },
+    } )
     await activity.create({
       By: { name: username, id: userID },
       action: "deleted",
@@ -197,6 +182,24 @@ const deleteHandler = async (req, res) => {
       item: { id: item._id, name: item.name },
       in: item.category,
     });
+    return await res.json({ success: true });
+  } catch (err) {
+    return res
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
+  }
+};
+
+const deleteByCategoryHandler = async (req, res) => {
+  try {
+    const { admin, username, id: userID } = req.auth;
+    if (admin === false) throw { code: 401, error: "You aren't an admin" };
+    const { id } = req.params;
+    const items = await readByCategory(id);
+    await items.forEach(item=>{
+      removeFile("item", item._id);
+    })
+    await removeByCategory(id);
     return await res.json({ success: true });
   } catch (err) {
     return res
@@ -255,6 +258,7 @@ module.exports = {
   updateHandler,
   moveHandler,
   deleteHandler,
+  deleteByCategoryHandler,
   readActivityHandler,
   getImage,
   getLength,
