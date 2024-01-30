@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-
+const sharp = require("sharp");
 const chars = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
 const MAX_FILESIZE = 2097152;
 const FILETYPES = ["image/jpg", "image/jpeg"];
@@ -10,17 +10,6 @@ const setID = () => {
   for (let i = 0; i < 10; i++)
     ID += chars.charAt(Math.floor(Math.random() * chars.length));
   return ID;
-};
-
-const moveFile = (file, to) => {
-  file.mv(to, (err) => {
-    if (err) {
-      throw {
-        code: err.status,
-        error: err.message,
-      };
-    }
-  });
 };
 
 const downloadAll = async (type) => {
@@ -81,17 +70,18 @@ const upload = (file, type, id) => {
       code: 400,
       error: "Unsupported file type",
     };
-  const destination = `${__dirname}/../../uploads/${type}/${id}`;
-  const filePath = `${destination}/${setID()}_${file.name}`;
-  fs.open(destination, "r+", (err, fd) => {
-    try {
-      if (err) {
-        if (err.code === "EEXIST") {
-          moveFile(file, filePath);
-        } else if (err.code === "ENOENT") {
+    console.log(file)
+    const destination = `${__dirname}/../../uploads/${type}/${id}`;
+    fs.open(destination, "r+", (err, fd) => {
+      try {
+        if (err) {
+          if (err.code === "EEXIST") {
+            sharp(file.data).toFile(`${destination}/${setID()}.webp`)
+          } else if (err.code === "ENOENT") {
           fs.mkdir(destination, { recursive: true }, (err) => {
-            if (err) throw { error: err };
-            else moveFile(file, filePath);
+            if (err){ throw { error: err }}
+            else{
+              sharp(file.data).toFile(`${destination}/${setID()}.webp`)}
           });
         } else {
           throw err;
@@ -126,7 +116,7 @@ const updateFile = (file, type, id) => {
         if (err.code === "ENOENT") {
           fs.mkdir(destination, { recursive: true }, (err) => {
             if (err) throw err;
-            else moveFile(file, filePath);
+            else sharp(file.data).toFile(`${destination}/${setID()}.webp`);
           });
         }
       } else {
@@ -138,7 +128,8 @@ const updateFile = (file, type, id) => {
             })
           );
         });
-        moveFile(file, filePath);
+        
+        sharp(file.data).toFile(`${destination}/${setID()}.webp`)
       }
     } finally {
       if (fd) {
