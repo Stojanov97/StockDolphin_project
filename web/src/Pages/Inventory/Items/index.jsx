@@ -12,6 +12,8 @@ import SearchIcon from "../../../Images/Search.png";
 import ItemTile from "../../../Components/Tiles/Item";
 import AddItemPopUp from "../../../Components/PopUps/Item/Add";
 import EditCategoryPopUp from "../../../Components/PopUps/Category/Edit";
+import { sliceLoading } from "../../../Slices/LoadingSlice";
+import { check } from "../../../Slices/CheckTokenSlice";
 
 const InventoryItem = () => {
   const { id } = useParams();
@@ -33,7 +35,7 @@ const InventoryItem = () => {
     dispatch(checkDB());
   }, []);
 
-  console.log(searchedItems);
+  console.log(category);
   const close = () => {
     setAddStat(false);
   };
@@ -45,6 +47,7 @@ const InventoryItem = () => {
         <EditCategoryPopUp
           close={() => setEditCategory(false)}
           name={category.name}
+          photo={category.photo}
         />
       )}
       <div className="breadcrumb">
@@ -52,6 +55,9 @@ const InventoryItem = () => {
           {" "}
           <span
             onClick={() => {
+            dispatch(sliceLoading(true))
+            dispatch(check())
+            dispatch(checkDB())
               navigate("/inventory");
             }}
           >
@@ -60,7 +66,9 @@ const InventoryItem = () => {
           &gt;{" "}
           <span
             onClick={() => {
-              window.location.reload(false);
+              dispatch(sliceLoading(true))
+              dispatch(check())
+              dispatch(checkDB())
             }}
           >
             {category && category.name}
@@ -111,6 +119,7 @@ const InventoryItem = () => {
                     id={item._id}
                     name={item.name}
                     updated={item.updatedAt}
+                    photo={item.photo}
                   />
                 ))
               ) : (

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { toggle } from "../../Slices/ForgotPasswordSlice";
 import { check } from "../../Slices/CheckTokenSlice";
+import { setTokenPayload } from "../../Slices/DecodedTokenSlice";
+import { sliceLoading } from "../../Slices/LoadingSlice";
 
 const Login = ({ tgHasAcc }) => {
   const dispatch = useDispatch();
@@ -60,9 +62,13 @@ const Login = ({ tgHasAcc }) => {
                 .then((data) => {
                   if (data.success === true) {
                     setErr(false);
+                    // dispatch(setTokenPayload(data.userData));
+                    dispatch(sliceLoading(true));
                     dispatch(check());
                   } else if (data.success === false) {
                     setErr(data.err);
+                    // dispatch(setTokenPayload(false));
+                    dispatch(check());
                   }
                 })
                 .catch((err) => console.log(err));

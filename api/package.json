@@ -23,7 +23,6 @@
     "express-http-proxy": "^2.0.0",
     "express-jwt": "^8.4.1",
     "express-session": "^1.17.3",
-    "image-to-base64": "^2.2.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.1",
     "node-input-validator": "^4.5.1",

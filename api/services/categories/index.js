@@ -4,7 +4,6 @@ const config = require("../../pkg/config").get;
 const {
   createHandler,
   readHandler,
-  readByUserHandler,
   updateHandler,
   deleteHandler,
   getImage,
@@ -37,7 +36,6 @@ service.use(
 );
 
 service.get("/api/v1/categories", readHandler);
-service.get("/api/v1/categories/user", readByUserHandler);
 service.get("/api/v1/categories/length", getLength);
 service.get("/api/v1/categories/image/:id", getImage);
 service.post("/api/v1/categories", createHandler);

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { check } from "../../Slices/CheckTokenSlice";
+import { setTokenPayload } from "../../Slices/DecodedTokenSlice";
+import { sliceLoading } from "../../Slices/LoadingSlice";
 
 const Register = ({ tgHasAcc }) => {
   const dispatch = useDispatch();
@@ -112,6 +114,7 @@ const Register = ({ tgHasAcc }) => {
                 if (data.success === true) {
                   setErr(false);
                   dispatch(check());
+                  dispatch(sliceLoading(true))
                 } else if (data.success === false) {
                   setErr(data.err);
                 }

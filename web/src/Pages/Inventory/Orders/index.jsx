@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { checkDB } from "../../../Slices/CheckForDBUpdatesSlice";
+import {check} from "../../../Slices/CheckTokenSlice"
 import { useNavigate, useParams } from "react-router-dom";
 import Currency from "react-currency-formatter";
 import "../Inventory.css";
@@ -9,6 +10,7 @@ import SortIcon from "../../../Images/Sort.png";
 import AddOrderPopUp from "../../../Components/PopUps/Order/Add";
 import AddInvoicePopUp from "../../../Components/PopUps/Invoice/Add";
 import EditItem from "../../../Components/PopUps/Item/Edit";
+import { sliceLoading } from "../../../Slices/LoadingSlice";
 
 const OrderInventory = () => {
   const { id } = useParams();
@@ -47,6 +49,10 @@ const OrderInventory = () => {
         <h1>
           <span
             onClick={() => {
+              
+            dispatch(sliceLoading(true))
+            dispatch(check())
+            dispatch(checkDB())
               navigate("/inventory");
             }}
           >
@@ -54,6 +60,10 @@ const OrderInventory = () => {
           </span>
           <span
             onClick={() => {
+              
+            dispatch(sliceLoading(true))
+            dispatch(check())
+            dispatch(checkDB())
               navigate(`/inventory/${item.category.id}`);
             }}
           >
@@ -61,7 +71,10 @@ const OrderInventory = () => {
           </span>
           <span
             onClick={() => {
-              window.location.reload(false);
+              
+            dispatch(sliceLoading(true))
+            dispatch(check())
+            dispatch(checkDB())
             }}
           >
             {item && `> ${item.name}`}{" "}

@@ -5,6 +5,7 @@ import ActivityIcon from "../../Images/Activity.png";
 import InventoryIcon from "../../Images/Inventory.png";
 import { useDispatch } from "react-redux";
 import { checkDB } from "../../Slices/CheckForDBUpdatesSlice";
+import { check } from "../../Slices/CheckTokenSlice";
 import { sliceLoading } from "../../Slices/LoadingSlice";
 
 const Reports = () => {
@@ -16,6 +17,7 @@ const Reports = () => {
         <h1
           onClick={() => {
             dispatch(sliceLoading(true))
+            dispatch(check());
             dispatch(checkDB());
           }}
         >
@@ -29,6 +31,7 @@ const Reports = () => {
           onClick={() => {
             navigate("/reports/activity");
             dispatch(sliceLoading(true))
+            dispatch(check());
             dispatch(checkDB());
           }}
         >

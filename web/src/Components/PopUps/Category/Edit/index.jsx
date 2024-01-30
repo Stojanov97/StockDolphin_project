@@ -8,13 +8,14 @@ import FileUploadIcon from "../../../../Images/AddImage.png";
 import DiscardPopUp from "../../DiscardPopUp";
 import { sliceLoading } from "../../../../Slices/LoadingSlice";
 import socket from "../../../../socket"
+import noPhotoThumb from "../../../../Images/noImgNoProb.jpg";
 
-const EditCategoryPopUp = ({ close, name: categoryName }) => {
+const EditCategoryPopUp = ({ close, name: categoryName, photo }) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [name, setName] = useState(categoryName);
-  const [image, setImage] = useState(`/api/v1/categories/image/${id}`);
-  let startImage = `/api/v1/categories/image/${id}`;
+  const [image, setImage] = useState(photo?`/api/v1/categories/image/${id}`: noPhotoThumb);
+  let startImage = photo?`/api/v1/categories/image/${id}`: noPhotoThumb;
   const [file, setFile] = useState("old");
   const [showDiscard, setShowDiscard] = useState(false);
   const [error, setError] = useState(false);

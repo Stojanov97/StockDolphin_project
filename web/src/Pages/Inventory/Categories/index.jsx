@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setListingOrder } from "../../../Slices/ListingOrderSlice";
 import { checkDB } from "../../../Slices/CheckForDBUpdatesSlice";
+import { check } from "../../../Slices/CheckTokenSlice";
 import Currency from "react-currency-formatter";
 import "../Inventory.css";
 import ListOrderIcon from "../../../Images/ListOrder.png";
@@ -10,6 +11,7 @@ import AddIcon from "../../../Images/Add.png";
 import SearchIcon from "../../../Images/Search.png";
 import CategoryTile from "../../../Components/Tiles/Category";
 import AddCategoryPopUp from "../../../Components/PopUps/Category/Add";
+import { sliceLoading } from "../../../Slices/LoadingSlice";
 
 const InventoryCategory = () => {
   const dispatch = useDispatch();
@@ -33,7 +35,9 @@ const InventoryCategory = () => {
       <div className="breadcrumb">
         <h1
           onClick={() => {
-            window.location.reload(false);
+            dispatch(sliceLoading(true))
+            dispatch(check())
+            dispatch(checkDB())
           }}
         >
           Inventory
@@ -107,6 +111,7 @@ const InventoryCategory = () => {
                     id={cat._id}
                     name={cat.name}
                     updated={cat.updatedAt}
+                    photo={cat.photo}
                   />
                 ))
               ) : (

@@ -2,13 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS } from "chart.js/auto";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import randomColor from "randomcolor";
 import "./Summary.css";
 import Select from "react-select";
+import { sliceLoading } from "../../../Slices/LoadingSlice";
+import { check } from "../../../Slices/CheckTokenSlice";
+import { checkDB } from "../../../Slices/CheckForDBUpdatesSlice";
 
 const ReportsSummary = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   let days = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
   let todayDate = new Date();
   let sevenDaysAgo = new Date(todayDate.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -106,6 +110,9 @@ const ReportsSummary = () => {
         <h1>
           <span
             onClick={() => {
+              dispatch(sliceLoading(true))
+              dispatch(check())
+              dispatch(checkDB())
               navigate("/reports");
             }}
           >
@@ -114,7 +121,9 @@ const ReportsSummary = () => {
           &gt;
           <span
             onClick={() => {
-              window.location.reload(false);
+              dispatch(sliceLoading(true))
+              dispatch(check())
+              dispatch(checkDB())
             }}
           >
             {" "}

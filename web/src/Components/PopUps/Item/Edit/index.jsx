@@ -10,6 +10,7 @@ import MoveIcon from "../../../../Images/MoveFolder.png";
 import DiscardPopUp from "../../DiscardPopUp";
 import MoveItemPopUp from "../Move";
 import socket from "../../../../socket";
+import noPhotoThumb from "../../../../Images/noImgNoProb.jpg";
 
 const EditItem = ({ id }) => {
   const dispatch = useDispatch();
@@ -17,7 +18,7 @@ const EditItem = ({ id }) => {
   const items = useSelector((state) => state.items.value);
   const [item, setItem] = useState(false);
   const [name, setName] = useState("");
-  const [image, setImage] = useState(`/api/v1/items/image/${id}`);
+  const [image, setImage] = useState(noPhotoThumb);
   const [file, setFile] = useState("old");
   const [error, setError] = useState(false);
   const [showMove, setShowMove] = useState(false);
@@ -28,6 +29,7 @@ const EditItem = ({ id }) => {
   useEffect(() => {
     if (item) {
       setName(item.name);
+      setImage(item.photo?`/api/v1/items/image/${id}`: noPhotoThumb)
     }
   }, [item]);
   useEffect(() => {

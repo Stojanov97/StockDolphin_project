@@ -3,9 +3,14 @@ import { useNavigate } from "react-router-dom";
 import "./Activity.css";
 import ActivityTile from "../../../Components/Tiles/Activity";
 import SortIcon from "../../../Images/Sort.png";
+import { sliceLoading } from "../../../Slices/LoadingSlice";
+import { check } from "../../../Slices/CheckTokenSlice";
+import { checkDB } from "../../../Slices/CheckForDBUpdatesSlice";
+import { useDispatch } from "react-redux";
 
 const ReportsActivity = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [activities, setActivities] = useState([]);
   const [sort, setSort] = useState(false);
   const [filter, setFilter] = useState(false);
@@ -21,6 +26,9 @@ const ReportsActivity = () => {
         <h1>
           <span
             onClick={() => {
+            dispatch(sliceLoading(true))
+            dispatch(check())
+            dispatch(checkDB())
               navigate("/reports");
             }}
           >
@@ -29,7 +37,9 @@ const ReportsActivity = () => {
           &gt;
           <span
             onClick={() => {
-              window.location.reload(false);
+              dispatch(sliceLoading(true))
+              dispatch(check())
+              dispatch(checkDB())
             }}
           >
             {" "}

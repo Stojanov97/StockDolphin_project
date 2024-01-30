@@ -52,18 +52,18 @@ const downloadAll = async (type) => {
 const downloadByID = async (type, id) => {
   try {
     const destination = `${__dirname}/../../uploads/${type}/${id}`;
-    let files = await fs.promises.readdir(destination, { recursive: true });
-    files = files
+    let file = await fs.promises.readdir(destination, { recursive: true });
+    file = file
       .filter(
         (value) => path.parse(value).base !== path.parse(value).name && value
       )
       .map((value) => {
         return path.normalize(`${destination}/${value}`);
       });
-    return files[0];
+    return file[0];
   } catch (err) {
     if (err.code === "ENOENT") {
-      return [];
+      return false;
     } else {
       throw { error: err };
     }
@@ -71,7 +71,6 @@ const downloadByID = async (type, id) => {
 };
 
 const upload = (file, type, id) => {
-  console.log(file.size);
   if (MAX_FILESIZE < file.size)
     throw {
       code: 413,

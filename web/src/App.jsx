@@ -41,24 +41,13 @@ function App() {
   const [invoices, setInvoices] = useState([]);
   const loading = useSelector((state) => state.loading.value);
   useEffect(() => {
-    (async () => {
-      const cookieString = document.cookie;
-      const cookies = cookieString.split("; ");
-
-      for (const cookie of cookies) {
-        const [cookieName, cookieValue] = cookie.split("=");
-        if (cookieName === "token") {
-          setToken(cookieValue);
-          return setLogged(true);
-        }
-      }
-      return fetch("/api/v1/auth/refreshToken", {
+     fetch("/api/v1/auth/refreshToken", {
         method: "POST",
       })
         .then((data) => data.json())
         .then((data) => {
           if (data.success === true) {
-            setToken(data.token);
+            setToken(data.userData);
             setLogged(true);
           } else {
             setToken(false);
@@ -69,12 +58,12 @@ function App() {
           }
         })
         .catch((err) => console.log(err));
-    })();
+return;
   }, [useSelector((state) => state.checkToken.value)]);
 
   useEffect(() => {
     if (token) {
-      dispatch(setTokenPayload(jwtDecode(token)));
+      dispatch(setTokenPayload(token));
     }
   }, [token]);
 

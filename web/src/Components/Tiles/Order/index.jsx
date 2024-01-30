@@ -12,7 +12,7 @@ const OrderTile = ({ id, name, quantity, price }) => {
         navigate(`/inventory/item/${id}`);
       }}
     >
-      <img src={`/api/v1/items/image/${id}`} alt="" className="small-img" />
+      <img src={`/api/v1/items/image/${id}`} alt="" className="small-img" loading="lazy" />
       <div className="info">
         <h1 className="orderName">{name}</h1>
         <div className="numbers">

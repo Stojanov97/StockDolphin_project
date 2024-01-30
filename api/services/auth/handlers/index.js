@@ -76,14 +76,16 @@ const registerHandler = async (req, res) => {
     sendMail(email, "Welcome To Our Platform", welcomeTemplate(username));
     await res.cookie("token", token, {
       expires: new Date(Date.now() + TOKEN_EXPIRE_SECONDS),
-      httpOnly: false,
+      httpOnly: true,
+      secure: true,
     });
     return await res
       .cookie("refreshToken", refreshToken, {
         expires: new Date(Date.now() + REFRESH_TOKEN_EXPIRE_SECONDS),
         httpOnly: true,
+        secure: true,
       })
-      .json({ success: true });
+      .json({ success: true, userData: payload});
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -122,14 +124,16 @@ const loginHandler = async (req, res) => {
     });
     await res.cookie("token", token, {
       expires: new Date(Date.now() + TOKEN_EXPIRE_SECONDS),
-      httpOnly: false,
+      httpOnly: true,
+      secure:true
     });
     return await res
       .cookie("refreshToken", refreshToken, {
         expires: new Date(Date.now() + REFRESH_TOKEN_EXPIRE_SECONDS),
         httpOnly: true,
+        secure:true
       })
-      .json({ success: true });
+      .json({ success: true, userData: payload});
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -236,6 +240,7 @@ const readAllHandler = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
+    // console.log(req.cookies.token, req.cookies.refreshToken)
     if (!req.cookies.token && req.cookies.refreshToken) {
       const { iat, exp, ...payload } = jwt.verify(
         req.cookies.refreshToken,
@@ -246,27 +251,33 @@ const refreshToken = async (req, res) => {
       });
       await res.cookie("token", token, {
         expires: new Date(Date.now() + TOKEN_EXPIRE_SECONDS),
-        httpOnly: false,
+        httpOnly: true,
+        secure: true,
       });
       return res
         .status(200)
-        .json({ success: true, msg: "Token refreshed", token: token });
+        .json({ success: true, msg: "Token refreshed", userData: payload});
     } else if (!req.cookies.refreshToken) {
       return res
         .status(404)
-        .json({ success: false, msg: "No refreshToken found", token: false });
+        .json({ success: false, msg: "No refreshToken found", userData: false });
     } else if (req.cookies.token) {
+      console.log("already had a token");
+      const { iat, exp, ...payload } = jwt.verify(
+        req.cookies.refreshToken,
+        config("REFRESH_JWT_SECRET")
+      );
       return res.status(200).json({
         success: true,
         msg: "already had a token",
-        token: req.cookies.token,
+        userData: payload
       });
     }
   } catch (err) {
     return res.status(err.code || 500).json({
       success: false,
       err: err || "Internal server error",
-      token: false,
+      userData: false,
     });
   }
 };

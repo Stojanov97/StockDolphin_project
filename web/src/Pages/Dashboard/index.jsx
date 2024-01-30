@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import Currency from "react-currency-formatter";
@@ -13,6 +13,9 @@ import ActivityTile from "../../Components/Tiles/Activity";
 import OrderTile from "../../Components/Tiles/Order";
 import DashboardSummaryTile from "../../Components/Tiles/DashboardSummary";
 import "./Dashboard.css";
+import {check} from "../../Slices/CheckTokenSlice"
+import {sliceLoading} from "../../Slices/LoadingSlice"
+import {checkDB} from "../../Slices/CheckForDBUpdatesSlice"
 
 const Dashboard = () => {
   const decoded = useSelector((state) => state.decodedToken.value);
@@ -24,6 +27,9 @@ const Dashboard = () => {
   );
   const [activities, setActivities] = useState([]);
   const [orders, setOrders] = useState([]);
+
+  const dispatch = useDispatch()
+
   useEffect(() => {
     fetch("/api/v1/items/recent")
       .then((data) => data.json())
@@ -51,7 +57,9 @@ const Dashboard = () => {
       <div className="breadcrumb">
         <h1
           onClick={() => {
-            window.location.reload(false);
+            dispatch(sliceLoading(true))
+            dispatch(check())
+            dispatch(checkDB())
           }}
         >
           Dashboard

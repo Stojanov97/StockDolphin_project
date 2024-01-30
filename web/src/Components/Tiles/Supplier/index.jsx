@@ -54,6 +54,7 @@ const SupplierTile = ({ name, address, email, phone, id }) => {
                 onClick={() => {
                   setEdit(true);
                 }}
+                loading="lazy"
               />
             </div>
             <div
@@ -62,7 +63,7 @@ const SupplierTile = ({ name, address, email, phone, id }) => {
                 setShowDelete(true);
               }}
             >
-              <img src={DeleteIcon} alt="Delete" />
+              <img src={DeleteIcon} alt="Delete" loading="lazy" />
             </div>
           </div>
         )}

@@ -6,6 +6,8 @@ import SearchIcon from "../../Images/Search.png";
 import AddIcon from "../../Images/Add.png";
 import SupplierTile from "../../Components/Tiles/Supplier";
 import AddSupplier from "../../Components/PopUps/Supplier/Add";
+import { sliceLoading } from "../../Slices/LoadingSlice";
+import { check } from "../../Slices/CheckTokenSlice";
 
 const Suppliers = () => {
   const dispatch = useDispatch();
@@ -27,7 +29,9 @@ const Suppliers = () => {
       <div className="breadcrumb">
         <h1
           onClick={() => {
-            window.location.reload(false);
+            dispatch(sliceLoading(true))
+            dispatch(check())
+            dispatch(checkDB())
           }}
         >
           Suppliers

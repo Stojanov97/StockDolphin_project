@@ -56,32 +56,17 @@ const createHandler = async (req, res) => {
 const readHandler = async (req, res) => {
   try {
     let items = await read();
+    let photos = await downloadAll("item");
+    items = items.map((item) => {
+      return {
+        ...item._doc,
+        ...{
+          photo: photos.find(({ id }) => item._doc._id == id) || false,
+        },
+      };
+    });
+    console.log(items);
     return await res.json(items);
-  } catch (err) {
-    return res
-      .status(err.code || 500)
-      .json({ success: false, err: err.error || "Internal server error" });
-  }
-};
-
-const readByUserHandler = async (req, res) => {
-  try {
-    const { id } = req.auth;
-    let items = await readByUserID(id);
-   
-    return res.json(items);
-  } catch (err) {
-    return res
-      .status(err.code || 500)
-      .json({ success: false, err: err.error || "Internal server error" });
-  }
-};
-
-const readByCategoryHandler = async (req, res) => {
-  try {
-    const { id } = req.params;
-    let items = await readByCategory(id);
-    return res.json(items);
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -167,7 +152,6 @@ const deleteHandler = async (req, res) => {
     let item = await readByID(id);
     await remove(id);
     await removeFile("item", id);
-    // await removeByItem(id);
     await fetch(`http://127.0.0.1:${config("APP_PORT")}/api/v1/orders/item/${id}`, {
       method: "DELETE",
       headers: {
@@ -222,9 +206,7 @@ const getImage = async (req, res) => {
   try {
     const path = await downloadByID("item", req.params.id);
     return await res.sendFile(
-      path.length > 0
-        ? path
-        : pathModule.resolve(__dirname, "../../../uploads/noImgNoProb.jpg"),
+      path,
       (err) => {
         if (err) {
           console.log(err);
@@ -253,8 +235,6 @@ const getLength = async (req, res) => {
 module.exports = {
   createHandler,
   readHandler,
-  readByUserHandler,
-  readByCategoryHandler,
   updateHandler,
   moveHandler,
   deleteHandler,

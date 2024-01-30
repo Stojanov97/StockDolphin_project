@@ -51,19 +51,16 @@ const createHandler = async (req, res) => {
 const readHandler = async (req, res) => {
   try {
     let categories = await read();
+    let photos = await downloadAll("cat");
+    categories = categories.map((cat) => {
+      return {
+        ...cat._doc,
+        ...{
+          photo: photos.find(({ id }) => cat._doc._id == id) || false,
+        },
+      };
+    });
     return await res.json(categories);
-  } catch (err) {
-    return res
-      .status(err.code || 500)
-      .json({ success: false, err: err.error || "Internal server error" });
-  }
-};
-
-const readByUserHandler = async (req, res) => {
-  try {
-    const { id } = req.auth;
-    let categories = await readByUserID(id);
-    return res.json(categories);
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -110,20 +107,26 @@ const deleteHandler = async (req, res) => {
     let category = await readByID(id);
     await remove(id);
     await removeFile("cat", id);
-    await fetch(`http://127.0.0.1:${config("APP_PORT")}/api/v1/items/cat/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "Cookie":`token=${req.cookies.token}`
-      },
-    })
-    await fetch(`http://127.0.0.1:${config("APP_PORT")}/api/v1/orders/cat/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "Cookie":`token=${req.cookies.token}`
-      },
-    })
+    await fetch(
+      `http://127.0.0.1:${config("APP_PORT")}/api/v1/items/cat/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `token=${req.cookies.token}`,
+        },
+      }
+    );
+    await fetch(
+      `http://127.0.0.1:${config("APP_PORT")}/api/v1/orders/cat/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `token=${req.cookies.token}`,
+        },
+      }
+    );
     await activity.create({
       By: { name: username, id: userID },
       action: "deleted",
@@ -142,18 +145,13 @@ const deleteHandler = async (req, res) => {
 const getImage = async (req, res) => {
   try {
     const path = await downloadByID("cat", req.params.id);
-    return await res.sendFile(
-      path.length > 0
-        ? path
-        : pathModule.resolve(__dirname, "../../../uploads/noImgNoProb.jpg"),
-      (err) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("Sent");
-        }
+    return await res.sendFile(path, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Sent");
       }
-    );
+    });
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -174,7 +172,6 @@ const getLength = async (req, res) => {
 module.exports = {
   createHandler,
   readHandler,
-  readByUserHandler,
   updateHandler,
   deleteHandler,
   getImage,

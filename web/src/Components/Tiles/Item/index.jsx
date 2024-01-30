@@ -5,8 +5,9 @@ import Currency from "react-currency-formatter";
 import "../DefaultTile.css";
 import DeleteIcon from "../../../Images/Delete.png";
 import DeleteItemPopUp from "../../PopUps/Item/Delete";
+import noPhotoThumb from "../../../Images/noImgNoProb.jpg";
 
-const ItemTile = ({ id, name, updated }) => {
+const ItemTile = ({ id, name, updated, photo }) => {
   const navigate = useNavigate();
   const orders = useSelector((state) => state.orders.value).filter(
     (order) => order.item.id === id
@@ -35,7 +36,7 @@ const ItemTile = ({ id, name, updated }) => {
           navigate(`/inventory/item/${id}`);
         }}
       >
-        <img className="thumb" src={`/api/v1/items/image/${id}`} alt="" />
+        <img className="thumb" src={photo?`/api/v1/items/image/${id}`:noPhotoThumb} alt="" loading="lazy" />
         <div className="info">
           <div className="top">
             <h1 className="default-tile-title">{name}</h1>
@@ -70,7 +71,7 @@ const ItemTile = ({ id, name, updated }) => {
                   setDeleteStat(true);
                 }}
               >
-                <img src={DeleteIcon} alt="delete" />
+                <img src={DeleteIcon} alt="delete" loading="lazy" />
               </div>
             )}
           </div>

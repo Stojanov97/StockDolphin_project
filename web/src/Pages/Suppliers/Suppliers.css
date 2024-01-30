@@ -7,5 +7,5 @@
   display: flex;
   flex-wrap: wrap;
   gap: 85px;
-  overflow: scroll;
+  overflow-y: scroll;
 }
