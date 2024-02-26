@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import logo from "../../Images/ITL-logo.png";
+import logo from "../../Images/ITL-logo.webp";
 import dashboard from "../../Images/Dashboard.png";
 import inventory from "../../Images/Inventory.png";
 import reports from "../../Images/Reports.png";

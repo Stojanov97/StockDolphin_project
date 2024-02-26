@@ -58,7 +58,6 @@ function App() {
           }
         })
         .catch((err) => console.log(err));
-return;
   }, [useSelector((state) => state.checkToken.value)]);
 
   useEffect(() => {
