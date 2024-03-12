@@ -4,7 +4,7 @@ const express = require("express");
 const config = require("../../pkg/config").get;
 const app = express();
 
-const allowCrossDomain = (req, res, next) => {
+const allowCrossDomain = (req, res, next) => { // CORS middleware
   res.header(`Access-Control-Allow-Origin`, `*`);
   res.header(`Access-Control-Allow-Methods`, `GET,PUT,PATCH,POST,DELETE`);
   res.header(`Access-Control-Allow-Headers`, `Content-Type`);
@@ -13,8 +13,8 @@ const allowCrossDomain = (req, res, next) => {
 };
 
 app.use(allowCrossDomain);
-
-app.use(
+ // Proxy all requests to the services
+app.use( 
   "/api/v1/auth",
   proxy(`http://127.0.0.1:${config("USERS_SERVICE_PORT")}`, {
     proxyReqPathResolver: (req) =>
@@ -79,7 +79,7 @@ app.use(
       `http://127.0.0.1:${config("SOCKET_SERVICE_PORT")}${req.url}`
   })
 );
-
+// Serve the web app
 app.use("/", express.static(path.join(__dirname, "../../../web/build")));
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../../../web/build", "index.html"));

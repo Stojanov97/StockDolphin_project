@@ -8,7 +8,7 @@ import DeleteCategoryPopUp from "../../PopUps/Category/Delete";
 import noImgThumb from "../../../Images/noImgNoProb.jpg";
 
 const CategoryTile = ({ id, name, updated, photo }) => {
-  console.log(photo)
+  console.log("testp",photo)
   const navigate = useNavigate();
   const items = useSelector((state) => state.items.value).filter(
     (item) => item.category.id === id
@@ -39,7 +39,7 @@ const CategoryTile = ({ id, name, updated, photo }) => {
           navigate(`/inventory/${id}`);
         }}
       >
-        <img className="thumb" src={photo? `/api/v1/categories/image/${id}`:noImgThumb} alt="" loading="lazy" />
+        <img className="thumb" src={photo? `/api/v1/categories/image/${photo.id}?${Math.random()}`:noImgThumb} alt="category photo" loading="lazy" />
         <div className="info">
           <div className="top">
             <h1 className="default-tile-title">{name}</h1>
@@ -52,7 +52,6 @@ const CategoryTile = ({ id, name, updated, photo }) => {
                 <Currency
                   currency="EUR"
                   quantity={invoices.reduce((acc, curr) => acc + curr.total, 0)}
-                  // quantity={amount}
                   pattern="! ###,##0.00 "
                   decimal=","
                   group="."

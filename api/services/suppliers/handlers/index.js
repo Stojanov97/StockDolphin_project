@@ -15,18 +15,19 @@ const { validate } = require("../../../pkg/validator");
 const createHandler = async (req, res) => {
   try {
     const { admin, id, username } = req.auth;
-    if (admin === false) throw { code: 401, error: "You aren't an admin" };
-    let data = { ...req.body, ...{ By: { id: id, name: username } } };
-    await validate(data, SupplierCreate);
-    let supplier = await create(data);
+    if (admin === false) throw { code: 401, error: "You aren't an admin" }; // Check if user is admin
+    let data = { ...req.body, ...{ By: { id: id, name: username } } }; // Add user info to the data
+    await validate(data, SupplierCreate); // Validate the data
+    let supplier = await create(data); // Create the supplier
     await activity.create({
+      // Log the activity
       By: { id: id, name: username },
       action: "created",
       what: "supplier",
       item: { name: supplier.name, id: supplier._id },
       in: { name: supplier.name, id: supplier._id },
     });
-    return await res.json({ success: true });
+    return await res.json({ success: true }); // Return success
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -36,7 +37,7 @@ const createHandler = async (req, res) => {
 
 const readHandler = async (req, res) => {
   try {
-    return await res.json(await read());
+    return await res.json(await read()); // Get all suppliers and return them
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -47,20 +48,21 @@ const readHandler = async (req, res) => {
 const updateHandler = async (req, res) => {
   try {
     const { admin, id: userID, username } = req.auth;
-    if (admin === false) throw { code: 401, error: "You aren't an admin" };
+    if (admin === false) throw { code: 401, error: "You aren't an admin" }; // Check if user is admin
     const { id } = req.params;
-    let data = { ...req.body, ...{ By: { id: userID, name: username } } };
-    await validate(data, SupplierUpdate);
-    await update(id, data);
-    let supplier = await readByID(id);
+    let data = { ...req.body, ...{ By: { id: userID, name: username } } }; // Add user info to the data
+    await validate(data, SupplierUpdate); // Validate the data
+    await update(id, data); // Update the supplier
+    let supplier = await readByID(id); // Get the updated supplier
     await activity.create({
+      // Log the activity
       By: { id: userID, name: username },
       action: "edited",
       what: "supplier",
       item: { name: supplier.name, id: supplier._id },
       in: { name: supplier.name, id: supplier._id },
     });
-    return await res.json({ success: true });
+    return await res.json({ success: true }); // Return success
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -71,18 +73,18 @@ const updateHandler = async (req, res) => {
 const deleteHandler = async (req, res) => {
   try {
     const { admin, username, id: userID } = req.auth;
-    if (admin === false) throw { code: 401, error: "You aren't an admin" };
+    if (admin === false) throw { code: 401, error: "You aren't an admin" }; // Check if user is admin
     const { id } = req.params;
-    let supplier = await readByID(id);
-    await remove(id);
-    await activity.create({
+    let supplier = await readByID(id); // Get the supplier
+    await remove(id); // Remove the supplier
+    await activity.create({ // Log the activity
       By: { id: userID, name: username },
       action: "deleted",
       what: "supplier",
       item: { name: supplier.name, id: supplier._id },
       in: { name: supplier.name, id: supplier._id },
     });
-    return await res.json({ success: true });
+    return await res.json({ success: true }); // Return success
   } catch (err) {
     return res
       .status(err.code || 500)

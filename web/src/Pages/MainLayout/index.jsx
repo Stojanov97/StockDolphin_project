@@ -15,7 +15,6 @@ import { useNavigate } from "react-router-dom";
 import { sliceLoading } from "../../Slices/LoadingSlice";
 import socket from "../../socket"
 import RefreshAlert from "../../Components/RefreshAlert";
-import { setTokenPayload } from "../../Slices/DecodedTokenSlice";
 
 const MainLayout = ({ children }) => {
   const dispatch = useDispatch();
@@ -76,8 +75,8 @@ const MainLayout = ({ children }) => {
             className="nav-btn"
             onClick={() => {
               dispatch(check());
-              // dispatch(sliceLoading(true))
-              // dispatch(checkDB());
+              dispatch(sliceLoading(true))
+              dispatch(checkDB());
               navigate("/reports");
             }}
           >

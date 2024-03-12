@@ -5,7 +5,7 @@ const CategoryCreate = {
 
 const CategoryUpdate = {
   name: "string",
-  // By: "object",
+  By: "object",
 };
 
 module.exports = {

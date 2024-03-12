@@ -115,7 +115,6 @@ const AddCategoryPopUp = ({ close }) => {
                 let data = new FormData();
                 data.append("name", name);
                 if (file) data.append("photo", file);
-                console.log(data);
                 await fetch("/api/v1/categories", {
                   method: "POST",
                   body: data,
@@ -124,8 +123,8 @@ const AddCategoryPopUp = ({ close }) => {
                 .then((data) => {
                   if (data.success === true) {
                     setError(false);
-                    dispatch(checkDB());
                     socket.emit("upis")
+                    dispatch(checkDB());
                   } else {
                     setError(data.err);
                   }

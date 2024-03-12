@@ -8,38 +8,40 @@ const { validate } = require("../../../pkg/validator");
 const createHandler = async (req, res) => {
   try {
     const { admin } = req.auth;
-    if (admin === false) throw { code: 401, error: "You aren't an admin" };
-    await validate(req.body, InvoiceCreate);
-    await create(req.body);
-    return await res.json({ success: true });
+    if (admin === false) throw { code: 401, error: "You aren't an admin" }; // Check if user is admin
+    await validate(req.body, InvoiceCreate); // Validate the data
+    await create(req.body); // Create the invoice
+    return await res.json({ success: true }); // Return success
   } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
+    return res
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 
 const moveHandler = async (req, res) => {
   try {
-    console.log(req.body)
     const { id } = req.params;
     const { admin } = req.auth;
-    if (admin === false) throw { code: 401, error: "You aren't an admin" };
-    await validate(req.body, InvoiceMove);
-    await move(id, req.body);
-    return await res.json({ success: true });
+    if (admin === false) throw { code: 401, error: "You aren't an admin" }; // Check if user is admin
+    await validate(req.body, InvoiceMove); // Validate the data
+    await move(id, req.body); // Move the invoice
+    return await res.json({ success: true }); // Return success
   } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
+    return res
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 
 const readHandler = async (req, res) => {
   try {
-    const data = await read();
-    return await res.json(data);
+    const data = await read(); // Get all invoices
+    return await res.json(data); // Return invoices
   } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
+    return res
+      .status(err.code || 500)
+      .json({ success: false, err: err.error || "Internal server error" });
   }
 };
 

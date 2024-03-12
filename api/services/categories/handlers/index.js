@@ -3,12 +3,10 @@ const {
   create,
   read,
   readByID,
-  readByUserID,
   update,
   remove,
 } = require("../../../pkg/categories");
 const activity = require("../../../pkg/activity");
-const pathModule = require("path");
 const {
   CategoryCreate,
   CategoryUpdate,
@@ -25,22 +23,22 @@ const {
 const createHandler = async (req, res) => {
   try {
     const { admin, username, id } = req.auth;
-    if (admin === false) throw { code: 401, error: "You aren't an admin" };
-    let data = {
+    if (admin === false) throw { code: 401, error: "You aren't an admin" }; // Check if user is admin
+    let data = { // Add user info to the data
       ...req.body,
       ...{ By: { name: username, id: id } },
     };
-    await validate(data, CategoryCreate);
-    let category = await create(data);
-    req.files && upload(req.files.photo, "cat", category._id);
-    await activity.create({
+    await validate(data, CategoryCreate); // Validate the data
+    let category = await create(data); // Create the category
+    req.files && upload(req.files.photo, "cat", category._id); // Check for a photo & if true upload
+    await activity.create({ // Log the activity
       By: { name: username, id: id },
       action: "created",
       what: "category",
       item: { id: category._id, name: category.name },
       in: { id: category._id, name: category.name },
     });
-    return await res.json({ success: true });
+    return await res.json({ success: true }); // Return success
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -50,9 +48,9 @@ const createHandler = async (req, res) => {
 
 const readHandler = async (req, res) => {
   try {
-    let categories = await read();
-    let photos = await downloadAll("cat");
-    categories = categories.map((cat) => {
+    let categories = await read(); // Get all categories
+    let photos = await downloadAll("cat"); // Get all photos
+    categories = categories.map((cat) => { // Map through categories and add photo to each category if extant
       return {
         ...cat._doc,
         ...{
@@ -60,7 +58,7 @@ const readHandler = async (req, res) => {
         },
       };
     });
-    return await res.json(categories);
+    return await res.json(categories); // Return categories
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -71,27 +69,27 @@ const readHandler = async (req, res) => {
 const updateHandler = async (req, res) => {
   try {
     const { admin, username, id: userID } = req.auth;
-    if (admin === false) throw { code: 401, error: "You aren't an admin" };
+    if (admin === false) throw { code: 401, error: "You aren't an admin" }; // Check if user is admin
     const { id } = req.params;
-    let data = {
+    let data = { // Add user info to the data
       ...req.body,
       ...{ By: { name: username, id: userID } },
     };
-    await validate(data, CategoryUpdate);
-    req.files && updateFile(req.files.photo, "cat", id);
-    if (req.body.removePhoto === "true") {
-      await removeFile("cat", id);
+    await validate(data, CategoryUpdate); // Validate the data
+    req.files && updateFile(req.files.photo, "cat", id); // Check for a photo & if true upload
+    if (req.body.removePhoto === "true") { // Check if user wants to remove the photo
+      await removeFile("cat", id); // Remove the photo
     }
-    await update(id, data);
-    let category = await readByID(id);
-    await activity.create({
+    await update(id, data); // Update the category
+    let category = await readByID(id); // Get the category
+    await activity.create({ // Log the activity
       By: { name: username, id: userID },
       action: "edited",
       what: "category",
       item: { id: category._id, name: category.name },
       in: { id: category._id, name: category.name },
     });
-    return await res.json({ success: true });
+    return await res.json({ success: true }); // Return success
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -102,12 +100,12 @@ const updateHandler = async (req, res) => {
 const deleteHandler = async (req, res) => {
   try {
     const { admin, username, id: userID } = req.auth;
-    if (admin === false) throw { code: 401, error: "You aren't an admin" };
+    if (admin === false) throw { code: 401, error: "You aren't an admin" }; // Check if user is admin
     const { id } = req.params;
-    let category = await readByID(id);
-    await remove(id);
-    await removeFile("cat", id);
-    await fetch(
+    let category = await readByID(id); // Get the category
+    await remove(id); // Remove the category
+    await removeFile("cat", id); // Remove the photo
+    await fetch( // Ping the items service to remove all items from the category
       `http://127.0.0.1:${config("APP_PORT")}/api/v1/items/cat/${id}`,
       {
         method: "DELETE",
@@ -117,7 +115,7 @@ const deleteHandler = async (req, res) => {
         },
       }
     );
-    await fetch(
+    await fetch( // Ping the orders service to remove all orders from the category
       `http://127.0.0.1:${config("APP_PORT")}/api/v1/orders/cat/${id}`,
       {
         method: "DELETE",
@@ -127,14 +125,14 @@ const deleteHandler = async (req, res) => {
         },
       }
     );
-    await activity.create({
+    await activity.create({ // Log the activity
       By: { name: username, id: userID },
       action: "deleted",
       what: "category",
       item: { id: category._id, name: category.name },
       in: { id: category._id, name: category.name },
     });
-    return await res.json({ success: true });
+    return await res.json({ success: true }); // Return success
   } catch (err) {
     return res
       .status(err.code || 500)
@@ -144,12 +142,10 @@ const deleteHandler = async (req, res) => {
 
 const getImage = async (req, res) => {
   try {
-    const path = await downloadByID("cat", req.params.id);
-    return await res.sendFile(path, (err) => {
-      if (err) {
+    const path = await downloadByID("cat", req.params.id); // Get the photo path
+    return await res.sendFile(path, (err) => { // Send the photo
+      if (err) { // If error log it
         console.log(err);
-      } else {
-        console.log("Sent");
       }
     });
   } catch (err) {
@@ -161,7 +157,7 @@ const getImage = async (req, res) => {
 
 const getLength = async (req, res) => {
   try {
-    return res.json((await read()).length);
+    return res.json((await read()).length); // Return the number of the categories
   } catch (err) {
     return res
       .status(err.code || 500)

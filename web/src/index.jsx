@@ -9,8 +9,8 @@ import { BrowserRouter } from "react-router-dom";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
+  <Provider store={store}> {/* Setting up store*/}
+    <PersistGate loading={null} persistor={persistor}> {/* PersistGate for persisting states */}
       <React.StrictMode>
         <BrowserRouter>
           <App />

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import { ThemeSwitcherProvider } from "react-css-theme-switcher";
 import { setTokenPayload } from "./Slices/DecodedTokenSlice";
 import { sliceCategories } from "./Slices/CategoriesSlice";
@@ -24,7 +23,7 @@ import ReportsSummary from "./Pages/Reports/Summary";
 import Suppliers from "./Pages/Suppliers";
 import { sliceLoading } from "./Slices/LoadingSlice";
 
-const themes = {
+const themes = { // Themes for the app
   light: `${__dirname}../light.css`,
   dark: `${__dirname}../dark.css`,
 };
@@ -32,8 +31,8 @@ const themes = {
 function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [logged, setLogged] = useState(false);
-  const [token, setToken] = useState(false);
+  const [logged, setLogged] = useState(false); // Logged in state
+  const [token, setToken] = useState(false); // Token payload
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -41,15 +40,15 @@ function App() {
   const [invoices, setInvoices] = useState([]);
   const loading = useSelector((state) => state.loading.value);
   useEffect(() => {
-     fetch("/api/v1/auth/refreshToken", {
+     fetch("/api/v1/auth/refreshToken", { // Refresh token fetch
         method: "POST",
       })
         .then((data) => data.json())
         .then((data) => {
-          if (data.success === true) {
+          if (data.success === true) { // If token is valid set token and logged in state
             setToken(data.userData);
             setLogged(true);
-          } else {
+          } else { // If token is invalid set token and logged in state to false
             setToken(false);
             setLogged(false);
             if (window.location.pathname !== "/resetPassword") {
@@ -60,13 +59,13 @@ function App() {
         .catch((err) => console.log(err));
   }, [useSelector((state) => state.checkToken.value)]);
 
-  useEffect(() => {
+  useEffect(() => { // Set token payload on token change
     if (token) {
       dispatch(setTokenPayload(token));
     }
   }, [token]);
 
-  useEffect(() => {
+  useEffect(() => { // Fetch data from the database, on change of logged status and checkDB value
     if (logged) {
       (async () => {
         await fetch("/api/v1/categories")
@@ -94,7 +93,7 @@ function App() {
     }
   }, [logged, useSelector((state) => state.checkDB.value)]);
 
-  useEffect(() => {
+  useEffect(() => { // Slice data from DB to the redux store
     dispatch(sliceCategories(categories));
     dispatch(sliceItems(items));
     dispatch(sliceOrders(orders));
@@ -103,16 +102,16 @@ function App() {
   }, [categories, items, orders, suppliers, invoices]);
 
   return (
-    <ThemeSwitcherProvider
+    <ThemeSwitcherProvider 
       defaultTheme={useSelector((state) =>
         state.theme.value ? "light" : "dark"
       )}
       themeMap={themes}
-    >
+    >{/* Theme switcher provider for the app */}
       <div className="App">
-        {logged ? (
+        {logged ? (// If logged in show the main layout
           <>
-            {loading && <Loading />}
+            {loading && <Loading />} {/*Show loading component if loading is true*/}
             <MainLayout>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
@@ -129,7 +128,7 @@ function App() {
               </Routes>
             </MainLayout>
           </>
-        ) : (
+        ) : ( // If not logged in show the sign in page
           <Routes>
             <Route path="/" element={<SignInPage />} />
             <Route path="/resetPassword" element={<PasswordReset />} />

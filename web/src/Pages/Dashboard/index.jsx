@@ -18,6 +18,7 @@ import {sliceLoading} from "../../Slices/LoadingSlice"
 import {checkDB} from "../../Slices/CheckForDBUpdatesSlice"
 
 const Dashboard = () => {
+  // Getting states
   const decoded = useSelector((state) => state.decodedToken.value);
   const catNum = useSelector((state) => state.categories.value.length);
   const itemNum = useSelector((state) => state.items.value.length);
@@ -30,7 +31,7 @@ const Dashboard = () => {
 
   const dispatch = useDispatch()
 
-  useEffect(() => {
+  useEffect(() => { // Fetching recent activities and orders
     fetch("/api/v1/items/recent")
       .then((data) => data.json())
       .then((data) => setActivities(data))
@@ -41,7 +42,7 @@ const Dashboard = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  const chunk = (array, size) => {
+  const chunk = (array, size) => { // Function to chunk the orders into groups of "size"
     return array.reduce((chunks, current, index) => {
       if (index % size === 0) {
         chunks.push([current]);
@@ -51,7 +52,6 @@ const Dashboard = () => {
       return chunks;
     }, []);
   };
-  console.log(activities);
   return (
     <section>
       <div className="breadcrumb">
