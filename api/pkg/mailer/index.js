@@ -1,10 +1,12 @@
 const mailer = require("@sendgrid/mail");
 const key = require("../config").get("SEND_GRID_KEY");
-const {get} = require("../config");
+const { get } = require("../config");
 const fs = require("fs");
 mailer.setApiKey(key);
 
-const readFile = (template) => { // Function to read the template
+let domain = get("DOMAIN");
+const readFile = (template) => {
+  // Function to read the template
   return new Promise((resolve, reject) =>
     fs.readFile(`${__dirname}/templates/${template}`, "utf-8", (err, data) => {
       if (err) {
@@ -16,7 +18,8 @@ const readFile = (template) => { // Function to read the template
   );
 };
 
-function Mail(to, subject, html, text) { // Constructor to create the email object
+function Mail(to, subject, html, text) {
+  // Constructor to create the email object
   this.to = to;
   this.from = get("EMAIL");
   this.subject = subject;
@@ -24,19 +27,23 @@ function Mail(to, subject, html, text) { // Constructor to create the email obje
   this.text = text;
 }
 
-const welcomeTemplate = async (username) => { // Function to create the welcome email template and replace the username
+const welcomeTemplate = async (username) => {
+  // Function to create the welcome email template and replace the username
   let template = await readFile("welcome.html");
   return await template.replaceAll("{{username}}", username);
 };
 
-const resetTemplate = async (username, id) => { // Function to create the reset password email template and replace the username and reset password link
+const resetTemplate = async (username, id) => {
+  // Function to create the reset password email template and replace the username and reset password link
   let template = await readFile("reset_password.html");
   return await template
     .replaceAll("{{username}}", username)
+    .replaceAll("{{domain}}", domain)
     .replaceAll("{{reset_password_link}}", id);
 };
 
-const sendMail = async (to, subject, template) => { // Function to send an email
+const sendMail = async (to, subject, template) => {
+  // Function to send an email
   try {
     let html = await template;
     let text = await html.replaceAll(/(<([^>]+)>)/gi, ""); // Remove the HTML tags from the email, to send it as a text

@@ -119,14 +119,12 @@ const AddItemPopUp = ({ close, name: categoryName }) => {
               data.append("category", id);
               data.append("categoryName", categoryName);
               if (file) data.append("photo", file);
-              console.log(data);
               await fetch("/api/v1/items", {
                 method: "POST",
                 body: data,
               })
                 .then((data) => data.json())
                 .then((data) => {
-                  console.log(data);
                   if (data.success === true) {
                     setError(false);
                     dispatch(checkDB());

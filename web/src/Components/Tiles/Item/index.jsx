@@ -36,7 +36,7 @@ const ItemTile = ({ id, name, updated, photo }) => {
           navigate(`/inventory/item/${id}`);
         }}
       >
-        <img className="thumb" src={photo?`/api/v1/items/image/${id}`:noPhotoThumb} alt="" loading="lazy" />
+        <img className="thumb" src={photo?`/api/v1/items/image/${id}?${updated}`:noPhotoThumb} alt="" loading="lazy" />
         <div className="info">
           <div className="top">
             <h1 className="default-tile-title">{name}</h1>

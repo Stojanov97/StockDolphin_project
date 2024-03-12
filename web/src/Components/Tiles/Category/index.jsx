@@ -39,7 +39,7 @@ const CategoryTile = ({ id, name, updated, photo }) => {
           navigate(`/inventory/${id}`);
         }}
       >
-        <img className="thumb" src={photo? `/api/v1/categories/image/${photo.id}?${Math.random()}`:noImgThumb} alt="category photo" loading="lazy" />
+        <img className="thumb" src={photo? `/api/v1/categories/image/${id}?${Math.random()*10}`:noImgThumb} alt="category photo" loading="lazy" />
         <div className="info">
           <div className="top">
             <h1 className="default-tile-title">{name}</h1>

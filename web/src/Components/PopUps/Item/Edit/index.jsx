@@ -3,11 +3,9 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { checkDB } from "../../../../Slices/CheckForDBUpdatesSlice";
 import "./EditItem.css";
-import CloseIcon from "../../../../Images/Close.png";
 import FileUploadIcon from "../../../../Images/AddImage.png";
 import GreenEditIcon from "../../../../Images/EditGreen.png";
 import MoveIcon from "../../../../Images/MoveFolder.png";
-import DiscardPopUp from "../../DiscardPopUp";
 import MoveItemPopUp from "../Move";
 import socket from "../../../../socket";
 import noPhotoThumb from "../../../../Images/noImgNoProb.jpg";
@@ -29,7 +27,7 @@ const EditItem = ({ id }) => {
   useEffect(() => {
     if (item) {
       setName(item.name);
-      setImage(item.photo?`/api/v1/items/image/${id}`: noPhotoThumb)
+      setImage(item.photo ? `/api/v1/items/image/${id}?${Math.random()*10}` : noPhotoThumb);
     }
   }, [item]);
   useEffect(() => {
@@ -41,8 +39,6 @@ const EditItem = ({ id }) => {
       setError(false);
     }
   }, [file]);
-
-  console.log(file);
 
   return (
     <>
@@ -138,11 +134,10 @@ const EditItem = ({ id }) => {
                   })
                     .then((data) => data.json())
                     .then((data) => {
-                      console.log(data);
                       if (data.success === true) {
                         setError(false);
+                        socket.emit("upis");
                         dispatch(checkDB());
-                        socket.emit("upis")
                       } else {
                         setError(data.err);
                       }

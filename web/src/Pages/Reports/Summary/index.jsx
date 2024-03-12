@@ -181,10 +181,8 @@ const ReportsSummary = () => {
             }),
             datasets: selectedCategoriesMapped.map((cat) => {
               let invoicesByCategory = invoices.filter((invoice) => {
-                // console.log(new Date(invoice.date).toDateString());
                 return invoice.category.id === cat._id;
               });
-              // console.log(new Date(await invoicesByCategory[0].date));
               let test = [];
               timeSpan.forEach((date) => {
                 let invoicesByDate = invoicesByCategory.filter(
@@ -205,7 +203,7 @@ const ReportsSummary = () => {
                 data: test,
                 borderColor: randomColor({
                   hue: "green",
-                  seed: cat.name,
+                  seed: cat.name + Math.random()*100,
                 }),
               };
             }),
