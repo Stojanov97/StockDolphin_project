@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.38f54ed8.css",
+    "main.css": "/static/css/main.8fccd938.css",
     "main.js": "/static/js/main.8e319d7a.js",
     "static/media/noImgNoProb.jpg": "/static/media/noImgNoProb.2efe78cdf6dbf909f571.jpg",
     "static/media/ITL-logo.webp": "/static/media/ITL-logo.899b4acd7e4750a7c1e2.webp",
     "index.html": "/index.html",
-    "main.38f54ed8.css.map": "/static/css/main.38f54ed8.css.map",
+    "main.8fccd938.css.map": "/static/css/main.8fccd938.css.map",
     "main.8e319d7a.js.map": "/static/js/main.8e319d7a.js.map"
   },
   "entrypoints": [
-    "static/css/main.38f54ed8.css",
+    "static/css/main.8fccd938.css",
     "static/js/main.8e319d7a.js"
   ]
 }

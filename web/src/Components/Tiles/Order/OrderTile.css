@@ -21,6 +21,10 @@
   font-size: 16px;
   font-weight: 400;
   text-align: start;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
 }
 
 .info {
